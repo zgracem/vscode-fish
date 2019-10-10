@@ -1,0 +1,53 @@
+{
+    "name": "fish3",
+    "displayName": "vscode-fish3",
+    "description": "Syntax highlighting and snippets for fish 3.x",
+    "version": "0.1.0",
+    "author": "Z. Grace Moreau",
+    "publisher": "zgm",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/zgracem/vscode-fish3"
+    },
+    "icon": "images/fish.png",
+    "engines": {
+        "vscode": "^1.33.0"
+    },
+    "categories": [
+        "Programming Languages",
+        "Snippets"
+    ],
+    "contributes": {
+        "languages": [
+            {
+                "id": "fish",
+                "aliases": [
+                    "friendly interactive shell (fish)",
+                    "fish"
+                ],
+                "extensions": [
+                    ".fish"
+                ],
+                "configuration": "./fish-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "fish",
+                "scopeName": "source.shell.fish",
+                "path": "./syntaxes/fish.tmLanguage"
+            }
+        ],
+        "snippets": [
+            {
+                "language": "fish",
+                "path": "./snippets/snippets.json"
+            }
+        ]
+    },
+    "__metadata": {
+        "id": "599092D6-C07D-4691-B7D7-19DAF4F3E942",
+        "publisherId": "C0F17A57-509D-428E-95A8-AE189E8EA8E6",
+        "publisherDisplayName": "Z. Grace Moreau"
+    }
+}
