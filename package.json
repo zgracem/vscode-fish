@@ -1,6 +1,5 @@
 {
     "name": "fish3",
-    "displayName": "vscode-fish3",
     "description": "Syntax highlighting and snippets for fish 3.x",
     "version": "0.1.0",
     "author": "Z. Grace Moreau",
