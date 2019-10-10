@@ -7,7 +7,7 @@
     "publisher": "zgm",
     "repository": {
         "type": "git",
-        "url": "https://github.com/zgracem/vscode-fish3"
+        "url": "https://github.com/zgracem/vscode-fish"
     },
     "icon": "images/fish.png",
     "engines": {

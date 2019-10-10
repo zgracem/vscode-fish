@@ -1,4 +1,4 @@
-# vscode-fish3
+# vscode-fish
 
 Syntax highlighting and snippets for [fish] files.
 
