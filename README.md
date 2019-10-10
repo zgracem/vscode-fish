@@ -1,6 +1,6 @@
 # vscode-fish3
 
-Syntax highlighting for [fish] 3.x files.
+Syntax highlighting and snippets for [fish] files.
 
 Based on [sublime-fish].
 
