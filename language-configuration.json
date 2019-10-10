@@ -20,5 +20,9 @@
         ["(", ")"],
         ["\"", "\""],
         ["'", "'"]
-    ]
+    ],
+    "indentationRules": {
+        "increaseIndentPattern": "^.*(begin|for|function|if|case|while)$",
+        "decreaseIndentPattern": "^\\s+end$"
+    }
 }

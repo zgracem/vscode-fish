@@ -28,7 +28,7 @@
                 "extensions": [
                     ".fish"
                 ],
-                "configuration": "./fish-configuration.json"
+                "configuration": "./language-configuration.json"
             }
         ],
         "grammars": [
