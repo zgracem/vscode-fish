@@ -22,7 +22,7 @@
         ["'", "'"]
     ],
     "indentationRules": {
-        "increaseIndentPattern": "^.*(begin|else|for|function|if|case|while)\\s*.*$",
-        "decreaseIndentPattern": "^\\s+(else|end)\\s*.*$"
+        "increaseIndentPattern": "^\\s*(begin|else|for|function|if|case|while)\\s*.*$",
+        "decreaseIndentPattern": "^\\s*(else|end)\\s*.*$"
     }
 }
