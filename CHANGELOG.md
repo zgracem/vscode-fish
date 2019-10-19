@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.2.0
+
+- Improved indentation regexes
+
 ## 0.1.1
 
 - Update metadata and README
