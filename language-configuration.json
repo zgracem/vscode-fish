@@ -22,8 +22,8 @@
         ["'", "'"]
     ],
     "indentationRules": {
-        "increaseIndentPattern": "^\\s*(else|for|function|if|case|while)\\s*.*$|^.*\\s*(begin)\\s*$",
-        "decreaseIndentPattern": "^\\s*(else|end)\\s*.*$"
+        "increaseIndentPattern": "^\\s*(else|for|function|if|case|while)\\b.*$|^.*\\b(begin)\\s*$",
+        "decreaseIndentPattern": "^\\s*(else|end)\\b.*$"
     },
     "folding": {
         "offSide": true,
