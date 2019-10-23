@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.2.1
+
+- Improved auto-closing quotes
+
 ## 0.2.0
 
 - Improved indentation regexes
