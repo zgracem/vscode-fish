@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.3.0
+
+- Added indentation rules for `switch...case` statements
+
 ## 0.2.1
 
 - Improved auto-closing quotes
