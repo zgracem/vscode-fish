@@ -27,16 +27,12 @@
 		<dict>
 			<key>begin</key>
 			<string>\)|end</string>
-			<key>comment</key>
-			<string>In an ideal world,</string>
 			<key>end</key>
 			<string>(?=[\s);&amp;|&lt;&gt;])</string>
 			<key>name</key>
 			<string>invalid.illegal.function-call.fish</string>
 		</dict>
 		<dict>
-			<key>comment</key>
-			<string>The first character of a pipeline can't be an '&amp;', and the base pipeline scope won't be able to mark it as invalid so we have to do so here</string>
 			<key>match</key>
 			<string>\&amp;</string>
 			<key>name</key>
@@ -45,8 +41,6 @@
 		<dict>
 			<key>begin</key>
 			<string>(?=\S)</string>
-			<key>comment</key>
-			<string>Anonymous scope - Base scope pipeline, goes up until a definitive end (typical control operators, or a comment to finish the line) or the sequences that could be an end if we're actually inside a $self scope right now (')' and "end")</string>
 			<key>end</key>
 			<string>(\n)|([;&amp;])|(?=\)|#|end)</string>
 			<key>endCaptures</key>
@@ -75,15 +69,11 @@
 	<dict>
 		<key>argument</key>
 		<dict>
-			<key>comment</key>
-			<string>This rule must be entirely standalone because it is used in scopes where parameters starting with hyphens are explicitly interpreted as arguments rather than as options</string>
 			<key>patterns</key>
 			<array>
 				<dict>
 					<key>begin</key>
 					<string>(?![\s);&amp;|&lt;&gt;^])</string>
-					<key>comment</key>
-					<string>End arg if it precedes whitespace or operators (excluding stderr redirect '^' due to a fish quirk)</string>
 					<key>end</key>
 					<string>(?=[\s);&amp;|&lt;&gt;])</string>
 					<key>patterns</key>
@@ -99,8 +89,6 @@
 									<string>meta.string.unquoted.fish punctuation.definition.process.fish</string>
 								</dict>
 							</dict>
-							<key>comment</key>
-							<string>Process expansion only occurs if the '%' is at the front of the argument, and continues for the entire argument</string>
 							<key>end</key>
 							<string>(?=[\s);&amp;|&lt;&gt;])</string>
 							<key>name</key>
@@ -108,8 +96,6 @@
 							<key>patterns</key>
 							<array>
 								<dict>
-									<key>comment</key>
-									<string>Match special process names. By a convention that I'm making up, scope them as a type of variable</string>
 									<key>match</key>
 									<string>(?:self|last)(?=$|[\s);&amp;|&lt;&gt;])</string>
 									<key>name</key>
@@ -122,8 +108,6 @@
 							</array>
 						</dict>
 						<dict>
-							<key>comment</key>
-							<string>Treat a sequence of integers (with possible sign and decimal separator) as a standalone constant. Do this separate to the</string>
 							<key>match</key>
 							<string>(?:[+-]?)(?:[0-9]+\.?[0-9]*|[0-9]*\.?[0-9]+)(?=$|[\s);&amp;|&lt;&gt;])</string>
 							<key>name</key>
@@ -132,8 +116,6 @@
 						<dict>
 							<key>begin</key>
 							<string>(?![\s($])</string>
-							<key>comment</key>
-							<string>This scope can be used by plugins to locate arguments which don't *start* with command substitution or variable expansion and may directly resolve to file paths. Of course, they could have command substitution or variable expansion further on in them, but looking ahead for that too is nontrivial</string>
 							<key>end</key>
 							<string>(?=[\s);&amp;|&lt;&gt;])</string>
 							<key>name</key>
@@ -141,8 +123,6 @@
 							<key>patterns</key>
 							<array>
 								<dict>
-									<key>comment</key>
-									<string>Home directory expansion only occurs if the '~' is at the front of the argument, so check it first</string>
 									<key>match</key>
 									<string>\~</string>
 									<key>name</key>
@@ -157,8 +137,6 @@
 						<dict>
 							<key>begin</key>
 							<string>(?!\s)</string>
-							<key>comment</key>
-							<string>Use standard parameter patterns for whatever doesn't match the above</string>
 							<key>end</key>
 							<string>(?=[\s);&amp;|&lt;&gt;])</string>
 							<key>name</key>
@@ -177,8 +155,6 @@
 		</dict>
 		<key>command-call-meta</key>
 		<dict>
-			<key>comment</key>
-			<string>Check if the command is a builtin which takes another command as parameters, ie, a meta command. However, ignore the command if it is taking an option, being backgrounded/piped, or in some cases redirected, as in such a case it should be picked up by</string>
 			<key>patterns</key>
 			<array>
 				<dict>
@@ -206,8 +182,6 @@
 							<string>meta.function-call.name.fish support.function.fish meta.string.unquoted.fish</string>
 						</dict>
 					</dict>
-					<key>comment</key>
-					<string>These meta commands force the parameter to behave as a standard command. They stop when their subcommand is piped. Notably, if the command is followed by redirection, then the redirection is legal and the command just prints its help text, so in that case we avoid opening this scope such that the command is caught elsewhere as a standard command</string>
 					<key>end</key>
 					<string>(?x)
 (?# Look ahead for control operations after whitespace)
@@ -239,8 +213,6 @@
 				<dict>
 					<key>begin</key>
 					<string>(?=(not)\b(?!\s*[\n)#;-]))</string>
-					<key>comment</key>
-					<string>If the command is followed by redirection, then the redirection is illegal so we have to open the scope and let it be caught by</string>
 					<key>end</key>
 					<string>(?=[\n)#;&amp;])</string>
 					<key>patterns</key>
@@ -256,8 +228,6 @@
 									<string>meta.function-call.name.fish keyword.operator.word.fish meta.string.unquoted.fish</string>
 								</dict>
 							</dict>
-							<key>comment</key>
-							<string>If the command is followed by an "&amp;", then that's invalid</string>
 							<key>end</key>
 							<string>(?![^\n\S]|\&amp;|\\\n)</string>
 							<key>patterns</key>
@@ -288,15 +258,11 @@
 		</dict>
 		<key>command-call-standard</key>
 		<dict>
-			<key>comment</key>
-			<string>Check if the command is any other legal command, ie, a standard command</string>
 			<key>patterns</key>
 			<array>
 				<dict>
 					<key>begin</key>
 					<string>(?=\S)</string>
-					<key>comment</key>
-					<string>Anonymous scope - A complete command comprising a name element and optional parameter, redirection, and comment elements</string>
 					<key>end</key>
 					<string>(?x)
 (?# Look ahead for operators)
@@ -314,15 +280,11 @@
 						<dict>
 							<key>begin</key>
 							<string>(?![\s&lt;&gt;^%])</string>
-							<key>comment</key>
-							<string>Anonymous scope - A name or block element. If a block is found, everything up to the `end` command is captured here. Note that redirection and process expansion can't start the element</string>
 							<key>end</key>
 							<string>(?=[\s);&amp;|&lt;&gt;])</string>
 							<key>patterns</key>
 							<array>
 								<dict>
-									<key>comment</key>
-									<string>Look for block structures</string>
 									<key>include</key>
 									<string>#command-call-standard-block</string>
 								</dict>
@@ -337,8 +299,6 @@
 											<string>meta.function-call.name.fish support.function.test.begin.fish</string>
 										</dict>
 									</dict>
-									<key>comment</key>
-									<string>Look for the alternate form of test, which uses a matching pair of '[' ']'</string>
 									<key>end</key>
 									<string>(\])|(\n|[;&amp;)|].*)</string>
 									<key>endCaptures</key>
@@ -383,16 +343,12 @@
 											<string>meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish</string>
 										</dict>
 									</dict>
-									<key>comment</key>
-									<string>Look for loop/function control commands. We perform no checking on the validity of their scope (because only allowing them in the correct scope won't work if they are used within if-blocks) or parameters (because fish does that during execution not parsing)</string>
 									<key>match</key>
 									<string>(?:break|continue|return)(?=[\s);&amp;|&lt;&gt;])</string>
 								</dict>
 								<dict>
 									<key>begin</key>
 									<string>(?!\s)</string>
-									<key>comment</key>
-									<string>Anonymous scope - A generic name element</string>
 									<key>end</key>
 									<string>(?=[\s);&amp;|&lt;&gt;])</string>
 									<key>patterns</key>
@@ -400,8 +356,6 @@
 										<dict>
 											<key>begin</key>
 											<string>(?=\()</string>
-											<key>comment</key>
-											<string>fish would match the whole command name invalid if there was a command substitution anywhere in it, but we can't look ahead that effectively</string>
 											<key>end</key>
 											<string>(?=[\s);&amp;|&lt;&gt;])</string>
 											<key>name</key>
@@ -419,8 +373,6 @@
 										<dict>
 											<key>begin</key>
 											<string>(?!\s)</string>
-											<key>comment</key>
-											<string>Otherwise, treat the element as a fraction of a name made of arbitrary strings (which breaks at an escaped newline)</string>
 											<key>end</key>
 											<string>(?=[\s);&amp;(|&lt;&gt;])</string>
 											<key>name</key>
@@ -428,8 +380,6 @@
 											<key>patterns</key>
 											<array>
 												<dict>
-													<key>comment</key>
-													<string>The string scope explicitly forbids '$' so that the argument rule can pick it up as a variable expansion, but '$' is treated as a literal in command names, so we have to match it separately</string>
 													<key>match</key>
 													<string>\$</string>
 													<key>name</key>
@@ -448,8 +398,6 @@
 						<dict>
 							<key>begin</key>
 							<string>\%</string>
-							<key>comment</key>
-							<string>A command name can't begin with a process expansion operator (however the variable expansion operator '$' is allowed)</string>
 							<key>end</key>
 							<string>(?=[\s);&amp;|&lt;&gt;])</string>
 							<key>name</key>
@@ -462,8 +410,6 @@
 						<dict>
 							<key>begin</key>
 							<string>(?=[^\n\S]+)</string>
-							<key>comment</key>
-							<string>Match any whitespace characters that aren't the newline</string>
 							<key>end</key>
 							<string>(?x)
 (?# Look ahead for operators)
@@ -481,8 +427,6 @@
 								<dict>
 									<key>begin</key>
 									<string>(?!--[\s);&amp;|&lt;&gt;])</string>
-									<key>comment</key>
-									<string>A list of elements that does not start with an end-of-options parameter</string>
 									<key>end</key>
 									<string>(?x)
 (?# Look ahead for operators or the end of options)
@@ -521,8 +465,6 @@
 								<dict>
 									<key>begin</key>
 									<string>(?=--[\s);&amp;|&lt;&gt;])</string>
-									<key>comment</key>
-									<string>A list of elements that starts with an end-of-options parameter</string>
 									<key>end</key>
 									<string>(?x)
 (?# Look ahead for operators)
@@ -540,8 +482,6 @@
 										<dict>
 											<key>begin</key>
 											<string>(?=--[\s);&amp;|&lt;&gt;])</string>
-											<key>comment</key>
-											<string>Contain just the end-of-options parameter and give it the normal scope</string>
 											<key>end</key>
 											<string>(?=[\s);&amp;|&lt;&gt;])</string>
 											<key>patterns</key>
@@ -555,8 +495,6 @@
 										<dict>
 											<key>begin</key>
 											<string>(?=\s)</string>
-											<key>comment</key>
-											<string>A list of elements (now forcibly using arguments)</string>
 											<key>end</key>
 											<string>(?x)
 (?# Look ahead for operators)
@@ -615,8 +553,6 @@
 							<string>invalid.illegal.operator.fish</string>
 						</dict>
 					</dict>
-					<key>comment</key>
-					<string>Block commands cannot be backgrounded, piped, or redirected</string>
 					<key>match</key>
 					<string>(begin|while|if|for|switch|function)\s*([&amp;|&lt;&gt;])</string>
 				</dict>
@@ -634,8 +570,6 @@
 							<string>invalid.illegal.operator.fish</string>
 						</dict>
 					</dict>
-					<key>comment</key>
-					<string>The begin command uniquely cannot be the last command in a command substitution</string>
 					<key>match</key>
 					<string>(begin)\s*(\))</string>
 				</dict>
@@ -650,8 +584,6 @@
 							<string>meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish</string>
 						</dict>
 					</dict>
-					<key>comment</key>
-					<string>The begin command can be alone on a line or followed by any command that doesn't start with a '-'. If a '-' is seen it shouldn't be treated as a block</string>
 					<key>end</key>
 					<string>end(?=$|[\s);&amp;|&lt;&gt;])</string>
 					<key>endCaptures</key>
@@ -675,8 +607,6 @@
 				<dict>
 					<key>begin</key>
 					<string>(?=while\s+[^\s)#;-])</string>
-					<key>comment</key>
-					<string>If the command name is followed by a valid string (not anything that closes the scope or a string starting with a '-') then open the scope</string>
 					<key>end</key>
 					<string>end(?=$|[\s);&amp;|&lt;&gt;])</string>
 					<key>endCaptures</key>
@@ -702,8 +632,6 @@
 									<string>meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish</string>
 								</dict>
 							</dict>
-							<key>comment</key>
-							<string>Anonymous scope - Capture the command name we know is there, include a single instance of a pipeline, and end when an operator is seen</string>
 							<key>end</key>
 							<string>(?=[\n);&amp;])</string>
 							<key>patterns</key>
@@ -734,8 +662,6 @@
 									<string>meta.function-call.operator.control.fish keyword.operator.control.fish</string>
 								</dict>
 							</dict>
-							<key>comment</key>
-							<string>Anonymous scope - Capture the operator we know is there, include the base scope, and end when an `end` command is seen. Base scope handles any invalid operators</string>
 							<key>end</key>
 							<string>(?=end(?:$|[\s);&amp;|&lt;&gt;]))</string>
 							<key>patterns</key>
@@ -751,8 +677,6 @@
 				<dict>
 					<key>begin</key>
 					<string>(?=if\s+[^\s)#;-])</string>
-					<key>comment</key>
-					<string>If the command name is followed by a valid string (not anything that closes the scope or a string starting with a '-') then open the scope</string>
 					<key>end</key>
 					<string>end(?=$|[\s);&amp;|&lt;&gt;])</string>
 					<key>endCaptures</key>
@@ -776,8 +700,6 @@
 				<dict>
 					<key>begin</key>
 					<string>(?=for\s+[^\s)#;-])</string>
-					<key>comment</key>
-					<string>If the command name is followed by a valid string (not anything that closes the scope or a string starting with a '-') then open the scope</string>
 					<key>end</key>
 					<string>end(?=$|[\s);&amp;|&lt;&gt;])</string>
 					<key>endCaptures</key>
@@ -808,8 +730,6 @@
 									<string>meta.function-call.fish</string>
 								</dict>
 							</dict>
-							<key>comment</key>
-							<string>Anonymous scope - Capture the command name we know is there, include a single instance of a parameter (the varname), and end when the whitespace after the varname is captured</string>
 							<key>end</key>
 							<string>\s+</string>
 							<key>endCaptures</key>
@@ -831,8 +751,6 @@
 									<string>#parameter</string>
 								</dict>
 								<dict>
-									<key>comment</key>
-									<string>Capture anything that a parameter explicitly rejects, which is mostly operators</string>
 									<key>match</key>
 									<string>\S+</string>
 									<key>name</key>
@@ -841,8 +759,6 @@
 							</array>
 						</dict>
 						<dict>
-							<key>comment</key>
-							<string>Line continuation is allowed between the varname and "in"</string>
 							<key>include</key>
 							<string>#line-continuation</string>
 						</dict>
@@ -857,8 +773,6 @@
 									<string>meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish</string>
 								</dict>
 							</dict>
-							<key>comment</key>
-							<string>Anonymous scope - Capture the command name which might be there, include an arbitrary number of arguments, and end when the control operator is seen</string>
 							<key>end</key>
 							<string>(?=[\n)#;&amp;])</string>
 							<key>patterns</key>
@@ -893,8 +807,6 @@
 									<string>meta.function-call.operator.control.fish keyword.operator.control.fish</string>
 								</dict>
 							</dict>
-							<key>comment</key>
-							<string>Anonymous scope - Capture the operator we know is there, include the base scope, and end when an `end` command is seen. Base scope handles any invalid operators</string>
 							<key>end</key>
 							<string>(?=end(?:$|[\s);&amp;|&lt;&gt;]))</string>
 							<key>patterns</key>
@@ -906,8 +818,6 @@
 							</array>
 						</dict>
 						<dict>
-							<key>comment</key>
-							<string>Anything beside line continuation, "in", or a control operator is invalid</string>
 							<key>match</key>
 							<string>\S+?(?=[\s);&amp;])</string>
 							<key>name</key>
@@ -922,8 +832,6 @@
 				<dict>
 					<key>begin</key>
 					<string>(?=switch\s+[^\s)#;-])</string>
-					<key>comment</key>
-					<string>If the command name is followed by a valid string (not anything that closes the scope or a string starting with a '-') then open the scope</string>
 					<key>end</key>
 					<string>end(?=$|[\s);&amp;|&lt;&gt;])</string>
 					<key>endCaptures</key>
@@ -941,8 +849,6 @@
 						<dict>
 							<key>begin</key>
 							<string>(?=switch)</string>
-							<key>comment</key>
-							<string>Anonymous scope - Match the valid part of the switch statement, then look for an invalid part</string>
 							<key>end</key>
 							<string>(?=[\n);&amp;])</string>
 							<key>patterns</key>
@@ -963,8 +869,6 @@
 											<string>meta.function-call.fish</string>
 										</dict>
 									</dict>
-									<key>comment</key>
-									<string>Anonymous scope - Capture the command name we know is there, include a single instance of a parameter (the value), and end when whitespace or a control operator is seen</string>
 									<key>end</key>
 									<string>(?=[\s);&amp;])</string>
 									<key>patterns</key>
@@ -978,8 +882,6 @@
 											<string>#parameter</string>
 										</dict>
 										<dict>
-											<key>comment</key>
-											<string>Capture anything that a parameter explicitly rejects, which is mostly operators</string>
 											<key>match</key>
 											<string>\S+</string>
 											<key>name</key>
@@ -998,8 +900,6 @@
 											<string>meta.function-call.fish</string>
 										</dict>
 									</dict>
-									<key>comment</key>
-									<string>Anonymous scope - Capture whitespace which might be there, match any non-control-operator strings as invalid, and end when a control operator is seen</string>
 									<key>end</key>
 									<string>(?=[\n);&amp;])</string>
 									<key>patterns</key>
@@ -1030,8 +930,6 @@
 									<string>meta.function-call.operator.control.fish keyword.operator.control.fish</string>
 								</dict>
 							</dict>
-							<key>comment</key>
-							<string>Anonymous scope - Capture the operator we know is there, include the base scope, and end when an `end` command is seen. Base scope handles any invalid operators</string>
 							<key>end</key>
 							<string>(?=end(?:$|[\s);&amp;|&lt;&gt;]))</string>
 							<key>patterns</key>
@@ -1047,8 +945,6 @@
 											<string>meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish</string>
 										</dict>
 									</dict>
-									<key>comment</key>
-									<string>Anonymous scope - Capture the command name which might be there, include an arbitrary number of arguments, and end when the control operator is captured. Base scope further down handles any invalid operators used to end the scope</string>
 									<key>end</key>
 									<string>(\n)|(;)|(?=[)#&amp;|]|(?:[0-9]+)?(?:&lt;|&gt;&gt;?)|\^\^?)</string>
 									<key>endCaptures</key>
@@ -1091,8 +987,6 @@
 				<dict>
 					<key>begin</key>
 					<string>(?=function\s+[^\s)#;-])</string>
-					<key>comment</key>
-					<string>If the command name is followed by a valid string (not anything that closes the scope or a string starting with a '-') then open the scope</string>
 					<key>end</key>
 					<string>end(?=$|[\s);&amp;|&lt;&gt;])</string>
 					<key>endCaptures</key>
@@ -1110,8 +1004,6 @@
 						<dict>
 							<key>begin</key>
 							<string>(?=function)</string>
-							<key>comment</key>
-							<string>Anonymous scope - Match the defined name of the function statement, then look for further parameters</string>
 							<key>end</key>
 							<string>(?x)
 (?# Look ahead for operators)
@@ -1142,8 +1034,6 @@
 											<string>keyword.control.conditional.fish meta.string.unquoted.fish</string>
 										</dict>
 									</dict>
-									<key>comment</key>
-									<string>Anonymous scope - Capture the command name we know is there, include a single instance of a parameter (the value), and end when whitespace or a control operator is seen</string>
 									<key>end</key>
 									<string>(?=[\s);&amp;|&lt;&gt;])</string>
 									<key>patterns</key>
@@ -1163,8 +1053,6 @@
 										<dict>
 											<key>begin</key>
 											<string>(?!\\\n)</string>
-											<key>comment</key>
-											<string>Anonymous scope - Start when an escaped newline isn't present, and end when whitespace or an operator is seen</string>
 											<key>end</key>
 											<string>(?=[\s);&amp;|&lt;&gt;])</string>
 											<key>patterns</key>
@@ -1172,8 +1060,6 @@
 												<dict>
 													<key>begin</key>
 													<string>(?![\s)])</string>
-													<key>comment</key>
-													<string>This is all the usual things a parameter is allowed to contain</string>
 													<key>end</key>
 													<string>(?=[\s);&amp;|&lt;&gt;])</string>
 													<key>name</key>
@@ -1193,8 +1079,6 @@
 								<dict>
 									<key>begin</key>
 									<string>(?=[^\n\S])</string>
-									<key>comment</key>
-									<string>Anonymous scope - Capture whitespace which might be there, then match anything normal for a command call, except redirections!</string>
 									<key>end</key>
 									<string>(?x)
 (?# Look ahead for operators)
@@ -1241,8 +1125,6 @@
 									<string>meta.function-call.operator.control.fish keyword.operator.control.fish</string>
 								</dict>
 							</dict>
-							<key>comment</key>
-							<string>Anonymous scope - Capture the operator we know is there, include the base scope, and end when an `end` command is seen. Base scope handles any invalid operators</string>
 							<key>end</key>
 							<string>(?=end(?:$|[\s);&amp;|&lt;&gt;]))</string>
 							<key>patterns</key>
@@ -1259,15 +1141,11 @@
 		</dict>
 		<key>command-call-standard-block-if-internal</key>
 		<dict>
-			<key>comment</key>
-			<string>The acceptable structure internal to an if-end block can be represented recursively because anonymous scopes nest silently. If an `else` without a following `if` is seen, then further `else` commands will be correctly marked as invalid. This is a lot of work just to get that extra little bit of functionality :)</string>
 			<key>patterns</key>
 			<array>
 				<dict>
 					<key>begin</key>
 					<string>(?=if(?:\s*\n|\s+[^\s;]))</string>
-					<key>comment</key>
-					<string>Anonymous scope - Capture an `if` and the command up to the control operator, then capture from the control operator indefinitely</string>
 					<key>end</key>
 					<string>(?=end(?:$|[\s);&amp;|&lt;&gt;]))</string>
 					<key>patterns</key>
@@ -1283,8 +1161,6 @@
 									<string>meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish</string>
 								</dict>
 							</dict>
-							<key>comment</key>
-							<string>Anonymous scope - Match the command name we know is there, include a single instance of a pipeline, and end when a control operator is seen</string>
 							<key>end</key>
 							<string>(?=[\n#;&amp;])</string>
 							<key>patterns</key>
@@ -1315,8 +1191,6 @@
 									<string>meta.function-call.operator.control.fish keyword.operator.control.fish</string>
 								</dict>
 							</dict>
-							<key>comment</key>
-							<string>Anonymous scope - Match the operator we know is there, then include the base scope or an `else` structure. Base scope handles any invalid operators</string>
 							<key>end</key>
 							<string>(?=end(?:$|[\s);&amp;|&lt;&gt;]))</string>
 							<key>patterns</key>
@@ -1324,8 +1198,6 @@
 								<dict>
 									<key>begin</key>
 									<string>(?=else\s*[\s;])</string>
-									<key>comment</key>
-									<string>Anonymous scope - Capture an `else` up to the control operator or the start of an `if` structure, then match from the control operator indefinitely or match an `if` structure</string>
 									<key>end</key>
 									<string>(?=end(?:$|[\s);&amp;|&lt;&gt;]))</string>
 									<key>patterns</key>
@@ -1341,8 +1213,6 @@
 													<string>meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish</string>
 												</dict>
 											</dict>
-											<key>comment</key>
-											<string>Anonymous scope - Match the `else` we know is there and any comment, and mark anything besides an `if` as illegal</string>
 											<key>end</key>
 											<string>(?=[\n#;&amp;]|if(?:\s*\n|\s+[^\s;]))</string>
 											<key>patterns</key>
@@ -1356,8 +1226,6 @@
 													<string>#line-continuation</string>
 												</dict>
 												<dict>
-													<key>comment</key>
-													<string>Anything else is illegal</string>
 													<key>match</key>
 													<string>\S+?(?=[\s;&amp;])</string>
 													<key>name</key>
@@ -1381,8 +1249,6 @@
 													<string>meta.function-call.operator.control.fish keyword.operator.control.fish</string>
 												</dict>
 											</dict>
-											<key>comment</key>
-											<string>Anonymous scope - Match the operator which will be there if no `if` was seen, then include the base scope which marks further `else` commands as invalid. Base scope handles any invalid operators</string>
 											<key>end</key>
 											<string>(?=end(?:$|[\s);&amp;|&lt;&gt;]))</string>
 											<key>patterns</key>
@@ -1416,8 +1282,6 @@
 				<dict>
 					<key>begin</key>
 					<string>(?=\()</string>
-					<key>comment</key>
-					<string>Capture "(...)" or "(...)[...]"</string>
 					<key>end</key>
 					<string>(?![\(\[])</string>
 					<key>patterns</key>
@@ -1448,8 +1312,6 @@
 							<key>patterns</key>
 							<array>
 								<dict>
-									<key>comment</key>
-									<string>The inside of a command substitution is indistinguishable from a global scope</string>
 									<key>include</key>
 									<string>$self</string>
 								</dict>
@@ -1460,30 +1322,6 @@
 							<string>#index-expansion</string>
 						</dict>
 					</array>
-				</dict>
-			</array>
-		</dict>
-		<key>comment</key>
-		<dict>
-			<key>patterns</key>
-			<array>
-				<dict>
-					<key>begin</key>
-					<string>\#</string>
-					<key>beginCaptures</key>
-					<dict>
-						<key>0</key>
-						<dict>
-							<key>name</key>
-							<string>punctuation.definition.comment.fish</string>
-						</dict>
-					</dict>
-					<key>comment</key>
-					<string>A full or inline comment outside of any command call</string>
-					<key>end</key>
-					<string>\n</string>
-					<key>name</key>
-					<string>comment.line.fish</string>
 				</dict>
 			</array>
 		</dict>
@@ -1502,8 +1340,6 @@
 							<string>punctuation.section.brackets.begin.fish</string>
 						</dict>
 					</dict>
-					<key>comment</key>
-					<string>In other words, the anonymous scope which contains the variable and the index expansion parameter list should only be allowed to contain a single copy of each of those two things. We cannot enforce that without a scope stack. Our workaround is to allow an infinite number of these and hope the user can keep track of when there are too many</string>
 					<key>end</key>
 					<string>\]</string>
 					<key>endCaptures</key>
@@ -1537,16 +1373,12 @@
 							<string>#string-quoted</string>
 						</dict>
 						<dict>
-							<key>comment</key>
-							<string>There's no need to apply meta.string.unquoted to anything inside of an index expansion, as if it needs to be applied then it would have been handled already. The fact index expansion can appear inside of quotes (after a variable expansion) makes it tricky to decide what is or isn't "unquoted"</string>
 							<key>match</key>
 							<string>(?:[+-]?[0-9]+)(?=[\s);&amp;|&lt;&gt;]|\]|\.\.)</string>
 							<key>name</key>
 							<string>constant.numeric.fish</string>
 						</dict>
 						<dict>
-							<key>comment</key>
-							<string>Anything else is invalid</string>
 							<key>match</key>
 							<string>\S</string>
 							<key>name</key>
@@ -1558,15 +1390,11 @@
 		</dict>
 		<key>line-continuation</key>
 		<dict>
-			<key>comment</key>
-			<string>This rule should be included anywhere that escaping a newline and adding an arbitrary number of comment lines is permitted (which is pretty much everywhere in fish)</string>
 			<key>patterns</key>
 			<array>
 				<dict>
 					<key>begin</key>
 					<string>(?=\\\n)</string>
-					<key>comment</key>
-					<string>End when an unescaped newline is seen, the first character of a line isn't whitespace or a comment character or the escaped newline itself, or if the next character after some consumed whitespace isn't more whitespace or a comment character</string>
 					<key>end</key>
 					<string>(?=\n)|^(?![\s\#\\])|\s(?![\s\#])</string>
 					<key>patterns</key>
@@ -1592,15 +1420,11 @@
 				<dict>
 					<key>begin</key>
 					<string>(?![\s);&amp;|&lt;&gt;^])</string>
-					<key>comment</key>
-					<string>See the argument rule for more general information on parameters</string>
 					<key>end</key>
 					<string>(?=[\s);&amp;|&lt;&gt;])</string>
 					<key>patterns</key>
 					<array>
 						<dict>
-							<key>comment</key>
-							<string>End of options (parameter of just two hyphens)</string>
 							<key>match</key>
 							<string>(?:--)(?=[\s);&amp;|&lt;&gt;])</string>
 							<key>name</key>
@@ -1609,8 +1433,6 @@
 						<dict>
 							<key>begin</key>
 							<string>(?=--)</string>
-							<key>comment</key>
-							<string>Long option (parameter starting with two hyphens)</string>
 							<key>end</key>
 							<string>(?=[\s);&amp;|&lt;&gt;])</string>
 							<key>name</key>
@@ -1685,8 +1507,6 @@
 											<string>variable.parameter.fish punctuation.definition.option.long.separator.fish meta.string.unquoted.fish</string>
 										</dict>
 									</dict>
-									<key>comment</key>
-									<string>Consume the '=' and then use standard parameter patterns as well as numerics</string>
 									<key>end</key>
 									<string>(?=[\s);&amp;|&lt;&gt;])</string>
 									<key>patterns</key>
@@ -1716,8 +1536,6 @@
 									<string>punctuation.definition.option.short.fish meta.string.unquoted.fish</string>
 								</dict>
 							</dict>
-							<key>comment</key>
-							<string>Short option (parameter starting with one hyphen)</string>
 							<key>end</key>
 							<string>(?=[\s);&amp;|&lt;&gt;])</string>
 							<key>name</key>
@@ -1740,8 +1558,6 @@
 		</dict>
 		<key>parameter-patterns</key>
 		<dict>
-			<key>comment</key>
-			<string>The typical substitutions, expansions, and escapes allowed anywhere in a parameter</string>
 			<key>patterns</key>
 			<array>
 				<dict>
@@ -1751,8 +1567,6 @@
 				<dict>
 					<key>begin</key>
 					<string>(?=\$)</string>
-					<key>comment</key>
-					<string>Give variable expansion the unquoted string scope, since if it appears inside a string it gets the quoted string scope and we should mirror that</string>
 					<key>end</key>
 					<string>(?!\$)</string>
 					<key>name</key>
@@ -1773,15 +1587,11 @@
 		</dict>
 		<key>pipeline</key>
 		<dict>
-			<key>comment</key>
-			<string>The pipeline rule is nonterminating, meaning that it will not consume a *valid* control operator ('\n', ')', '#', ';', or '&amp;'). It *will* consume control operators that appear in invalid locations</string>
 			<key>patterns</key>
 			<array>
 				<dict>
 					<key>begin</key>
 					<string>(?=(and|or)\b(?!\s*[\n)#;-]))</string>
-					<key>comment</key>
-					<string>If the command is followed by redirection, then the redirection is illegal so we have to open the scope and let it be caught by</string>
 					<key>end</key>
 					<string>(?=[\n)#;&amp;])</string>
 					<key>patterns</key>
@@ -1797,8 +1607,6 @@
 									<string>meta.function-call.name.fish keyword.operator.word.fish meta.string.unquoted.fish</string>
 								</dict>
 							</dict>
-							<key>comment</key>
-							<string>If the command is followed by an "&amp;", then that's invalid</string>
 							<key>end</key>
 							<string>(?![^\n\S]|\&amp;|\\\n)</string>
 							<key>patterns</key>
@@ -1833,15 +1641,11 @@
 		</dict>
 		<key>pipeline-segment</key>
 		<dict>
-			<key>comment</key>
-			<string>The pipeline segment is agnostic of where it appears in the overall pipeline, but it does perform checks on what can appear after a pipe (if there is one) before it will recurse into itself</string>
 			<key>patterns</key>
 			<array>
 				<dict>
 					<key>begin</key>
 					<string>(?=[&amp;|]|(?:[0-9]+)?(?:&lt;|&gt;&gt;?)|\^\^?)</string>
-					<key>comment</key>
-					<string>Match operators (background, pipe, and redirect) which cannot start a pipeline because they must be consumed within or after a pipeline</string>
 					<key>end</key>
 					<string>(?x)
 (?# Look ahead to ensure no more operators after whitespace)
@@ -1868,8 +1672,6 @@
 					</array>
 				</dict>
 				<dict>
-					<key>comment</key>
-					<string>Match a command which is illegal in the base scope</string>
 					<key>match</key>
 					<string>(?:case|else|end)(?=[\s);&amp;|&lt;&gt;])</string>
 					<key>name</key>
@@ -1878,8 +1680,6 @@
 				<dict>
 					<key>begin</key>
 					<string>(?=[^\s#])</string>
-					<key>comment</key>
-					<string>Anonymous scope - A pipeline which may be one command call or multiple command calls linked by pipe operators ('|', '2&gt;|', etc). The pipeline terminates at the first encounter of any control operator</string>
 					<key>end</key>
 					<string>(?=[\n)#;&amp;])</string>
 					<key>patterns</key>
@@ -1891,8 +1691,6 @@
 (?!
   \s|\#|(?:(?:[0-9]+)?(?:&lt;|&gt;&gt;?)|\^\^?)?\|
 )</string>
-							<key>comment</key>
-							<string>Anonymous scope - Match the command of a pipeline segment</string>
 							<key>end</key>
 							<string>(?x)
 (?# Look ahead for operators after whitespace)
@@ -1924,15 +1722,11 @@
 (?=
   (?:(?:[0-9]+)?(?:&lt;|&gt;&gt;?)|\^\^?)?\|
 )</string>
-							<key>comment</key>
-							<string>Anonymous scope - Match piping which may lead to a second command, and if it does recurse into</string>
 							<key>end</key>
 							<string>(?=[\n)#;&amp;])</string>
 							<key>patterns</key>
 							<array>
 								<dict>
-									<key>comment</key>
-									<string>Check for a malformed pipeline segment; if the pipeline would end with a control operator (or a comment, which implies a newline), then mark the pipe itself invalid</string>
 									<key>match</key>
 									<string>(?:(?:[0-9]+)?(?:&lt;|&gt;&gt;?)|\^\^?)?\|(?=\s*(?:$|[\n)#;&amp;]))</string>
 									<key>name</key>
@@ -1969,15 +1763,11 @@
 											<string>keyword.operator.pipe.fish</string>
 										</dict>
 									</dict>
-									<key>comment</key>
-									<string>Otherwise, we'll say the pipe is okay and let the tests at the start of</string>
 									<key>end</key>
 									<string>(?=[\n)#;&amp;])</string>
 									<key>patterns</key>
 									<array>
 										<dict>
-											<key>comment</key>
-											<string>This match should generally be pretty similar to the match which seeks a valid "and"/"or" in</string>
 											<key>match</key>
 											<string>(and|or)\b(?!\s*[\n;-])</string>
 											<key>name</key>
@@ -2010,8 +1800,6 @@
 				<dict>
 					<key>begin</key>
 					<string>(?=(?:[0-9]+(?:&lt;|&gt;&gt;|&gt;)|&gt;&gt;|\^\^|[&lt;&gt;^])\&amp;)</string>
-					<key>comment</key>
-					<string>End at anything that would end a parameter, including redirections *if* they are *not* this same type of redirection (ie, have an '&amp;'), in which case this scope stays open and we match the next one. The negative lookahead for &lt;&gt;^ at the end is to keep ST2 happy (not hanging)</string>
 					<key>end</key>
 					<string>(?=[\s);&amp;|]|(?:[0-9]+(?:&lt;|&gt;&gt;|&gt;)|&gt;&gt;|\^\^|[&lt;&gt;^])(?![&amp;&lt;&gt;^]))</string>
 					<key>patterns</key>
@@ -2047,8 +1835,6 @@
 									<string>keyword.operator.redirect.dereference.fish</string>
 								</dict>
 							</dict>
-							<key>comment</key>
-							<string>We have to try and catch an '&amp;' here because if it is seen by the outer end match then it will be considered a valid operator and the redirection scope will immediately terminate</string>
 							<key>end</key>
 							<string>([#&amp;]\S*)|(?![&amp;\\])</string>
 							<key>endCaptures</key>
@@ -2079,8 +1865,6 @@
 						<dict>
 							<key>begin</key>
 							<string>(?=\()</string>
-							<key>comment</key>
-							<string>Evaluates to a string which may be an integer</string>
 							<key>end</key>
 							<string>(?!\()</string>
 							<key>name</key>
@@ -2096,8 +1880,6 @@
 						<dict>
 							<key>begin</key>
 							<string>(?=\$)</string>
-							<key>comment</key>
-							<string>Evaluates to a string which may be an integer</string>
 							<key>end</key>
 							<string>(?!\$)</string>
 							<key>name</key>
@@ -2113,8 +1895,6 @@
 						<dict>
 							<key>begin</key>
 							<string>(?=['"])</string>
-							<key>comment</key>
-							<string>May be a quoted integer, which is allowed</string>
 							<key>end</key>
 							<string>(?!['"])</string>
 							<key>name</key>
@@ -2140,8 +1920,6 @@
 							<string>meta.function-call.operator.redirection.file-descriptor.fish meta.string.unquoted.fish keyword.operator.redirect.close.fish</string>
 						</dict>
 						<dict>
-							<key>comment</key>
-							<string>Anything else is illegal</string>
 							<key>match</key>
 							<string>(?:\S+)</string>
 							<key>name</key>
@@ -2152,8 +1930,6 @@
 				<dict>
 					<key>begin</key>
 					<string>(?=(?:[0-9]+(?:&lt;|&gt;&gt;|&gt;)|&gt;&gt;|\^\^|[&lt;&gt;^])\??)</string>
-					<key>comment</key>
-					<string>End at anything that would end a parameter, including redirections *if* they are *not* this same type of redirection (ie, redirection into file descriptor, or into pipe), in which case this scope stays open and we match the next one</string>
 					<key>end</key>
 					<string>(?=[\s);&amp;|]|(?:[0-9]+(?:&lt;|&gt;&gt;|&gt;)|&gt;&gt;|\^\^|[&lt;&gt;^])[&amp;|])</string>
 					<key>patterns</key>
@@ -2189,8 +1965,6 @@
 									<string>keyword.operator.redirect.clobber-test.fish</string>
 								</dict>
 							</dict>
-							<key>comment</key>
-							<string>We have to try and catch bad operators here because if they are seen by the outer end match then they will be considered valid and the redirection scope will immediately terminate</string>
 							<key>end</key>
 							<string>((?:[#&amp;?]|[0-9]*[&lt;&gt;^])\S*)|(?![&amp;?&lt;&gt;^])</string>
 							<key>endCaptures</key>
@@ -2221,24 +1995,18 @@
 						<dict>
 							<key>begin</key>
 							<string>\{|(?=\})</string>
-							<key>comment</key>
-							<string>A redirection path cannot contain brace expansion</string>
 							<key>end</key>
 							<string>[\s);&amp;|}]</string>
 							<key>name</key>
 							<string>meta.function-call.operator.redirection.fish invalid.illegal.path.fish</string>
 						</dict>
 						<dict>
-							<key>comment</key>
-							<string>A redirection path cannot contain wildcard expansion</string>
 							<key>match</key>
 							<string>[*?]</string>
 							<key>name</key>
 							<string>meta.function-call.operator.redirection.fish invalid.illegal.path.fish</string>
 						</dict>
 						<dict>
-							<key>comment</key>
-							<string>Check for characters which are associated with redirection, so path cannot begin with them</string>
 							<key>match</key>
 							<string>(?:[&amp;?]|[0-9]*[&lt;&gt;^]).*$</string>
 							<key>name</key>
@@ -2253,8 +2021,6 @@
 						<dict>
 							<key>begin</key>
 							<string>(?![\s);&amp;(|&lt;&gt;${}*?])</string>
-							<key>comment</key>
-							<string>Use strings to build a file path, but break out if any invalid elements or elements that wouldn't form a literal path are encountered</string>
 							<key>end</key>
 							<string>(?=[\s);&amp;(|&lt;&gt;${}*?])</string>
 							<key>name</key>
@@ -2268,8 +2034,6 @@
 								<dict>
 									<key>begin</key>
 									<string>(?![\s);&amp;(|&lt;&gt;${}*?]|['"])</string>
-									<key>comment</key>
-									<string>Should use the same patterns as the above begin/end, but also add the quotes so the</string>
 									<key>end</key>
 									<string>(?=[\s);&amp;(|&lt;&gt;${}*?]|['"])</string>
 									<key>name</key>
@@ -2287,8 +2051,6 @@
 						<dict>
 							<key>begin</key>
 							<string>(?=\()</string>
-							<key>comment</key>
-							<string>A raw path cannot begin with '(' since this undergoes command substitution</string>
 							<key>end</key>
 							<string>(?!\()</string>
 							<key>name</key>
@@ -2304,8 +2066,6 @@
 						<dict>
 							<key>begin</key>
 							<string>(?=\$)</string>
-							<key>comment</key>
-							<string>We also make sure that variable expansion is scoped as an unquoted string, since if it appears inside quotes then it gets scoped as a quoted string and we should mirror that</string>
 							<key>end</key>
 							<string>(?!\$)</string>
 							<key>name</key>
@@ -2327,8 +2087,6 @@
 			<key>patterns</key>
 			<array>
 				<dict>
-					<key>comment</key>
-					<string>Fundamental structure used to separate elements of a command call; it's any whitespace that isn't a newline, predominantly meaning spaces or tabs</string>
 					<key>match</key>
 					<string>(?:[^\n\S]+)</string>
 					<key>name</key>
@@ -2380,8 +2138,6 @@
 					<key>patterns</key>
 					<array>
 						<dict>
-							<key>comment</key>
-							<string>Only accepted escapes are \' and \\</string>
 							<key>match</key>
 							<string>\\[\'\\]</string>
 							<key>name</key>
@@ -2415,16 +2171,12 @@
 					<key>patterns</key>
 					<array>
 						<dict>
-							<key>comment</key>
-							<string>Only accepted escapes are \&lt;newline&gt;, \", \\, and \$</string>
 							<key>match</key>
 							<string>\\[\n\"\\$]</string>
 							<key>name</key>
 							<string>constant.character.escape.fish</string>
 						</dict>
 						<dict>
-							<key>comment</key>
-							<string>Variable expansion is the only expansion accepted</string>
 							<key>include</key>
 							<string>#variable-expansion</string>
 						</dict>
@@ -2439,8 +2191,6 @@
 				<dict>
 					<key>begin</key>
 					<string>(?![\s);&amp;(|&lt;&gt;'"$])</string>
-					<key>comment</key>
-					<string>End unquoted string at anything that can't be in one</string>
 					<key>end</key>
 					<string>(?=[\s);&amp;(|&lt;&gt;'"$])</string>
 					<key>name</key>
@@ -2457,8 +2207,6 @@
 		</dict>
 		<key>string-unquoted-patterns</key>
 		<dict>
-			<key>comment</key>
-			<string>Describe contents of an unquoted string separately for ease of recursion</string>
 			<key>patterns</key>
 			<array>
 				<dict>
@@ -2510,8 +2258,6 @@
 							<string>#variable-expansion</string>
 						</dict>
 						<dict>
-							<key>comment</key>
-							<string>Unescaped spaces aren't allowed, as technically that separates the braces into two separate arguments. Don't consume a newline though, so the scope end capture can get it</string>
 							<key>match</key>
 							<string>(?:[^\n\S]+)</string>
 							<key>name</key>
@@ -2530,8 +2276,6 @@
 						<dict>
 							<key>begin</key>
 							<string>(?![\s);&amp;|&lt;&gt;'"])</string>
-							<key>comment</key>
-							<string>Begin/end string as before with the addition of breaking at a '}' or ','</string>
 							<key>end</key>
 							<string>(?=[\s);&amp;|&lt;&gt;'"]|\}|\,)</string>
 							<key>patterns</key>
@@ -2581,8 +2325,6 @@
 			<key>patterns</key>
 			<array>
 				<dict>
-					<key>comment</key>
-					<string>This list follows the order given in official fish documentation. Technically '~' and '%' only need escaping if they appear at the front of a parameter. If they are escaped within a parameter, then fish does not *highlight* the escape, however it does silently *parse* the escape and the backslash is removed before the parameter is passed to the command. So, we highlight these escapes as well since they are actually treated as valid escapes by fish</string>
 					<key>match</key>
 					<string>(?x)
 \\[abefnrtv $\\*?#(){}\[\]&lt;&gt;^&amp;|;"']
@@ -2612,8 +2354,6 @@
 			<key>patterns</key>
 			<array>
 				<dict>
-					<key>comment</key>
-					<string>Just for convenience we separate the newline escape</string>
 					<key>match</key>
 					<string>\\\n</string>
 					<key>name</key>
@@ -2632,8 +2372,6 @@
 				<dict>
 					<key>begin</key>
 					<string>(?=\$)</string>
-					<key>comment</key>
-					<string>Capture "$foo" or "$foo[]" or "$$foo[][]" etc</string>
 					<key>end</key>
 					<string>(?=[^\$\[])</string>
 					<key>name</key>
@@ -2654,13 +2392,9 @@
 		</dict>
 		<key>variable-expansion-illegal</key>
 		<dict>
-			<key>comment</key>
-			<string>Describe illegal variable expansions separately</string>
 			<key>patterns</key>
 			<array>
 				<dict>
-					<key>comment</key>
-					<string>A lone '$' in a scope, or an attempt to expand a variable starting with a nonword character, is an error. These boundaries are the same as for meta.string.unquoted</string>
 					<key>match</key>
 					<string>\$(?:(?=[,'"\]}\s);&amp;|])|[^\w\$][^$,'"\]}\s);&amp;|]*)</string>
 					<key>name</key>
@@ -2670,8 +2404,6 @@
 		</dict>
 		<key>variable-expansion-simple</key>
 		<dict>
-			<key>comment</key>
-			<string>Describe variable expansion that has no index expansion separately</string>
 			<key>patterns</key>
 			<array>
 				<dict>
