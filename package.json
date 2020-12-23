@@ -42,7 +42,7 @@
             {
                 "language": "fish",
                 "scopeName": "source.shell.fish",
-                "path": "./syntaxes/fish.tmLanguage"
+                "path": "./syntaxes/fish.tmLanguage.json"
             },
             {
               "scopeName": "markdown.fish.codeblock",

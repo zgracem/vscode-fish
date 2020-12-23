@@ -1,5 +1,5 @@
 _source/
 node_modules/
 out/
-syntaxes/*.*-tmLanguage
+syntaxes/*.tmLanguage.*
 *.vsix
