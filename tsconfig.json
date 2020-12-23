@@ -9,5 +9,5 @@
     "sourceMap": false,
     "strict": true /* strict type-checking */
   },
-  "exclude": ["_source", "node_modules"]
+  "exclude": ["_scratch", "node_modules"]
 }
