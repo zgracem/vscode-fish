@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.4.0
+
+- Detect files that start with a `fish` hashbang
+- Support embedded code blocks in Markdown documents
+
 ## 0.3.0
 
 - Added indentation rules for `switch...case` statements
