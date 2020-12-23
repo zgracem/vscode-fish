@@ -28,6 +28,7 @@
                 "extensions": [
                     ".fish"
                 ],
+                "firstLine": "^#!.*\\b(fish)\\b",
                 "configuration": "./language-configuration.json"
             }
         ],
