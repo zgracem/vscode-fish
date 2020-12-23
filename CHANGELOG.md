@@ -1,6 +1,6 @@
 # Change Log
 
-## 0.5.0-alpha
+## 0.5.0
 
 - Add formatting and linting from [bmalehorn/vscode-fish].
 
