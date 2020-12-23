@@ -2,6 +2,7 @@ _scratch/
 .vscode/
 node_modules/
 dist/
+images/*.acorn
 src/
 .gitignore
 tsconfig.json
