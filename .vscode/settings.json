@@ -1,0 +1,30 @@
+{
+  "json.schemas": [
+    {
+      "fileMatch": [
+        "syntaxes/*.JSON-tmLanguage"
+      ],
+      "url": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json"
+    }
+  ],
+  "sortJSON.orderOverride": [
+    "include",
+    "comment",
+    "name",
+    "scopeName",
+    "fileTypes",
+    "firstLineMatch",
+    "foldingStartMarker",
+    "foldingStopMarker",
+    "begin",
+    "beginCaptures",
+    "end",
+    "endCaptures",
+    "match",
+    "captures",
+    "patterns"
+  ],
+  "sortJSON.orderUnderride": [
+    "uuid"
+  ]
+}

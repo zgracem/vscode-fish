@@ -1,1 +1,3 @@
+_source/
+syntaxes/*.*-tmLanguage
 *.vsix
