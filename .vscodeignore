@@ -1,7 +1,7 @@
 _scratch/
 .vscode/
 node_modules/
-out/
+dist/
 src/
 .gitignore
 tsconfig.json
