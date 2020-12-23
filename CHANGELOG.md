@@ -1,8 +1,10 @@
 # Change Log
 
-## 0.4.1
+## 0.5.0-alpha
 
-- Fixed a syntax highlighting bug
+- Add formatting and linting from [bmalehorn/vscode-fish].
+
+[bmalehorn/vscode-fish]: https://github.com/bmalehorn/vscode-fish
 
 ## 0.4.0
 
