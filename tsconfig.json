@@ -5,9 +5,8 @@
     "module": "commonjs",
     "lib": ["es6"],
     "target": "es6",
-    "noUnusedLocals": true, /* report errors on unused locals */
     "sourceMap": false,
-    "strict": true /* strict type-checking */
+    "strict": true
   },
-  "exclude": ["_scratch", "node_modules"]
+  "exclude": ["node_modules"]
 }
