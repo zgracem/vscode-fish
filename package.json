@@ -11,11 +11,17 @@
     },
     "icon": "images/fish.png",
     "engines": {
-        "vscode": "^1.33.0"
+        "vscode": "^1.36.0"
     },
     "categories": [
         "Programming Languages",
-        "Snippets"
+        "Snippets",
+        "Formatters",
+        "Linters"
+    ],
+    "main": "./out/extension",
+    "activationEvents": [
+        "onLanguage:fish"
     ],
     "contributes": {
         "languages": [
@@ -55,6 +61,18 @@
                 "path": "./snippets/snippets.json"
             }
         ]
+    },
+    "scripts": {
+        "vscode:prepublish": "yarn run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install"
+    },
+    "devDependencies": {
+        "@types/mocha": "^2.2.42",
+        "@types/node": "^8.10.66",
+        "typescript": "3.9.6",
+        "vscode": "^1.1.25"
     },
     "__metadata": {
         "id": "599092D6-C07D-4691-B7D7-19DAF4F3E942",
