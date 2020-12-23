@@ -1,4 +1,7 @@
 _source/
-src/**
-**/tsconfig.json
-**/*.ts
+.vscode/
+node_modules/
+out/
+src/
+.gitignore
+tsconfig.json
