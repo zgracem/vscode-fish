@@ -1,1 +1,7 @@
-_source/
+_scratch/
+.vscode/
+node_modules/
+dist/
+src/
+.gitignore
+tsconfig.json

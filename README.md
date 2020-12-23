@@ -1,11 +1,13 @@
 # vscode-fish
 
-Syntax highlighting and snippets for [fish] files.
+Syntax highlighting, snippets, formatting, and linting for [fish] files.
 
-Based on [Phidica/sublime-fish].
+Syntax definitions based on [Phidica/sublime-fish]. Formatting/linting based on
+[bmalehorn/vscode-fish].
 
 [fish]: http://fishshell.com
 [Phidica/sublime-fish]: https://github.com/Phidica/sublime-fish
+[bmalehorn/vscode-fish]: https://github.com/bmalehorn/vscode-fish
 
 ## Installation
 

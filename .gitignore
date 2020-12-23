@@ -1,3 +1,6 @@
-_source/
-syntaxes/*.*-tmLanguage
+_scratch/
+dist/
+node_modules/
+out/
+syntaxes/*.tmLanguage.*
 *.vsix
