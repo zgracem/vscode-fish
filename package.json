@@ -37,6 +37,16 @@
                 "language": "fish",
                 "scopeName": "source.shell.fish",
                 "path": "./syntaxes/fish.tmLanguage"
+            },
+            {
+              "scopeName": "markdown.fish.codeblock",
+              "path": "./syntaxes/markdown-codeblock.json",
+              "injectTo": [
+                "text.html.markdown"
+              ],
+              "embeddedLanguages": {
+                "meta.embedded.block.fish": "fish"
+              }
             }
         ],
         "snippets": [
