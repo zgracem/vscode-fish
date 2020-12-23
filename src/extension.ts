@@ -291,7 +291,7 @@ const runInWorkspace = (
       },
     );
     if (stdin) {
-      child.stdin.end(stdin);
+      child.stdin!.end(stdin);
     }
   });
 
