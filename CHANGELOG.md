@@ -6,6 +6,10 @@
 
 [bmalehorn/vscode-fish]: https://github.com/bmalehorn/vscode-fish
 
+## 0.4.1
+
+- Fixed a syntax highlighting bug
+
 ## 0.4.0
 
 - Detect files that start with a `fish` hashbang
