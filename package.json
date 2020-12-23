@@ -45,14 +45,14 @@
                 "path": "./syntaxes/fish.tmLanguage.json"
             },
             {
-              "scopeName": "markdown.fish.codeblock",
-              "path": "./syntaxes/markdown-codeblock.json",
-              "injectTo": [
-                "text.html.markdown"
-              ],
-              "embeddedLanguages": {
-                "meta.embedded.block.fish": "fish"
-              }
+                "scopeName": "markdown.fish.codeblock",
+                "path": "./syntaxes/markdown-codeblock.json",
+                "injectTo": [
+                    "text.html.markdown"
+                ],
+                "embeddedLanguages": {
+                    "meta.embedded.block.fish": "fish"
+                }
             }
         ],
         "snippets": [
