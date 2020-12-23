@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.5.0-alpha
+
+- Add formatting and linting from [bmalehorn/vscode-fish].
+
+[bmalehorn/vscode-fish]: https://github.com/bmalehorn/vscode-fish
+
 ## 0.4.0
 
 - Detect files that start with a `fish` hashbang
