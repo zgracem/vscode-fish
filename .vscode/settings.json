@@ -26,5 +26,6 @@
   ],
   "sortJSON.orderUnderride": [
     "uuid"
-  ]
+  ],
+  "typescript.tsc.autoDetect": "off"
 }
