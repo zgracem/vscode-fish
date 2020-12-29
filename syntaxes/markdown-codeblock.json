@@ -34,7 +34,7 @@
           "contentName": "meta.embedded.block.fish",
           "patterns": [
             {
-              "include": "source.fish"
+              "include": "source.shell.fish"
             }
           ]
         }
