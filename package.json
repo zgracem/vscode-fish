@@ -45,7 +45,7 @@
                 "path": "./syntaxes/fish.tmLanguage.json"
             },
             {
-                "scopeName": "markdown.fish.codeblock",
+                "scopeName": "source.shell.fish.fenced_code_block",
                 "path": "./syntaxes/markdown-codeblock.json",
                 "injectTo": [
                     "text.html.markdown"

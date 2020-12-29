@@ -41,5 +41,5 @@
       ]
     }
   },
-  "scopeName": "markdown.fish.codeblock"
+  "scopeName": "source.shell.fish.fenced_code_block"
 }
