@@ -2,12 +2,32 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"type": "npm",
-			"script": "compile",
+			"type": "shell",
+			"command": "${workspaceFolder}/.vscode/bin/prepublish.fish",
 			"group": {
 				"kind": "build",
 				"isDefault": true
 			},
+			"presentation": {
+				"echo": false,
+				"reveal": "silent",
+				"focus": false,
+				"panel": "dedicated",
+				"showReuseMessage": false,
+				"clear": true
+			},
+			"problemMatcher": [],
+			"label": "Recompile JavaScript and JSON",
+			"options": {
+				"env": {
+					"PATH": "${env:PATH}"
+				}
+			}
+		},
+		{
+			"type": "npm",
+			"script": "compile",
+			"group": "build",
 			"presentation": {
 				"echo": true,
 				"reveal": "silent",

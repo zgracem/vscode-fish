@@ -1,8 +1,5 @@
 #!/usr/bin/env fish
 
-set yaml_file vendor/sublime-fish/fish.YAML-tmLanguage
-set json_file syntaxes/fish.tmLanguage.json
-
 function remove_regex_comments
     sed -E '/^[[:space:]]+\(\?#/d' $argv[1]
 end

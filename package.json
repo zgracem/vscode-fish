@@ -80,8 +80,9 @@
         ]
     },
     "scripts": {
-        "vscode:prepublish": "npm run compile",
-        "compile": "tsc -p ./"
+        "vscode:prepublish": ".vscode/bin/prepublish.fish",
+        "compile": "tsc -p ./",
+        "package": ".vscode/bin/package.fish"
     },
     "devDependencies": {
         "@types/node": "^12.19.11",
