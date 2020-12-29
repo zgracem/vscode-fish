@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.5.2
+
+- Add syntax highlighting for `fish_variables` (and legacy `fishd.*`) files.
+- Include configuration defaults for `.fish` files (indent with 4 spaces only).
+
 ## 0.5.1
 
 - Fix broken embedded code blocks in Markdown documents.
