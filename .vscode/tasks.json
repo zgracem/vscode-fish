@@ -1,5 +1,18 @@
 {
 	"version": "2.0.0",
+	"presentation": {
+		"echo": false,
+		"reveal": "silent",
+		"focus": false,
+		"panel": "dedicated",
+		"showReuseMessage": false,
+		"clear": true
+	},
+	"options": {
+		"env": {
+			"PATH": "${env:PATH}"
+		}
+	},
 	"tasks": [
 		{
 			"type": "shell",
@@ -8,33 +21,15 @@
 				"kind": "build",
 				"isDefault": true
 			},
-			"presentation": {
-				"echo": false,
-				"reveal": "silent",
-				"focus": false,
-				"panel": "dedicated",
-				"showReuseMessage": false,
-				"clear": true
-			},
 			"problemMatcher": [],
-			"label": "Recompile JavaScript and JSON",
-			"options": {
-				"env": {
-					"PATH": "${env:PATH}"
-				}
-			}
+			"label": "Recompile JavaScript and JSON"
 		},
 		{
 			"type": "npm",
 			"script": "compile",
 			"group": "build",
 			"presentation": {
-				"echo": true,
-				"reveal": "silent",
-				"focus": false,
-				"panel": "dedicated",
-				"showReuseMessage": false,
-				"clear": true
+				"echo": true
 			},
 			"problemMatcher": "$tsc",
 			"label": "Compile TypeScript to JavaScript",
@@ -44,22 +39,9 @@
 			"type": "shell",
 			"command": "${workspaceFolder}/.vscode/bin/yaml2json.fish",
 			"group": "build",
-			"presentation": {
-				"echo": false,
-				"reveal": "silent",
-				"focus": false,
-				"panel": "dedicated",
-				"showReuseMessage": false,
-				"clear": true
-			},
 			"problemMatcher": [],
 			"label": "Compile YAML to JSON",
-			"detail": "Update .tmLanguage.json files",
-			"options": {
-				"env": {
-					"PATH": "${env:PATH}"
-				}
-			}
+			"detail": "Update .tmLanguage.json files"
 		}
 	]
 }
