@@ -46,3 +46,7 @@ remove_regex_comments vendor/sublime-fish/fish.YAML-tmLanguage | yaml2json \
 yaml2json syntaxes/fish-markdown-codeblock.tmLanguage.yaml \
     | inject_schema \
     >syntaxes/fish-markdown-codeblock.tmLanguage.json
+
+yaml2json syntaxes/fish_variables.tmLanguage.yaml \
+    | inject_schema \
+    >syntaxes/fish_variables.tmLanguage.json
