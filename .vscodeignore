@@ -4,5 +4,7 @@ node_modules/
 dist/
 images/*.acorn
 src/
+vendor/
 .gitignore
+.gitmodules
 tsconfig.json
