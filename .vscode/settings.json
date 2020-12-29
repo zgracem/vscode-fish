@@ -7,25 +7,5 @@
       "url": "./.vscode/schemas/tmLanguage.json"
     }
   ],
-  "sortJSON.orderOverride": [
-    "include",
-    "comment",
-    "name",
-    "scopeName",
-    "fileTypes",
-    "firstLineMatch",
-    "foldingStartMarker",
-    "foldingStopMarker",
-    "begin",
-    "beginCaptures",
-    "end",
-    "endCaptures",
-    "match",
-    "captures",
-    "patterns"
-  ],
-  "sortJSON.orderUnderride": [
-    "uuid"
-  ],
   "typescript.tsc.autoDetect": "off"
 }
