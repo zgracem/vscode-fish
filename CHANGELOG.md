@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.5.1
+
+- Fix broken embedded code blocks in Markdown documents.
+
 ## 0.5.0
 
 - Add formatting and linting from [bmalehorn/vscode-fish].
