@@ -35,7 +35,7 @@
                     ".fish"
                 ],
                 "firstLine": "^#!.*\\b(fish)\\b",
-                "configuration": "./language-configuration.json"
+                "configuration": "./fish-language-configuration.json"
             }
         ],
         "grammars": [
@@ -46,7 +46,7 @@
             },
             {
                 "scopeName": "source.shell.fish.fenced_code_block",
-                "path": "./syntaxes/markdown-codeblock.tmLanguage.json",
+                "path": "./syntaxes/fish-markdown-codeblock.tmLanguage.json",
                 "injectTo": [
                     "text.html.markdown"
                 ],
