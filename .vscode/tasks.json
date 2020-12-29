@@ -19,6 +19,27 @@
 			"problemMatcher": "$tsc",
 			"label": "Compile TypeScript to JavaScript",
 			"detail": "tsc -p ./"
+		},
+		{
+			"type": "shell",
+			"command": "${workspaceFolder}/.vscode/bin/yaml2json.fish",
+			"group": "build",
+			"presentation": {
+				"echo": false,
+				"reveal": "silent",
+				"focus": false,
+				"panel": "dedicated",
+				"showReuseMessage": false,
+				"clear": true
+			},
+			"problemMatcher": [],
+			"label": "Compile YAML to JSON",
+			"detail": "Update .tmLanguage.json files",
+			"options": {
+				"env": {
+					"PATH": "${env:PATH}"
+				}
+			}
 		}
 	]
 }

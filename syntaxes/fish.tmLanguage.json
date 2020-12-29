@@ -5,7 +5,7 @@
   "fileTypes": [
     "fish"
   ],
-  "uuid": "f9278d07-f7c1-4a9b-9581-ebcbc050fbfb",
+  "uuid": "73fe8880-b0d7-4073-8543-e923d65dad79",
   "patterns": [
     {
       "include": "#comment"
@@ -262,7 +262,7 @@
       "patterns": [
         {
           "begin": "(?=[&|]|(?:[0-9]+)?(?:<|>>?)|\\^\\^?)",
-          "end": "(?x)\n(?# Look ahead to ensure no more operators after whitespace)\n(?=\\n)\n|\n(?!\n  \\s*\n  (?:\n    (?# Find a control operator)\n    [\\n);&|]\n  |\n    (?# Find a pipe operator)\n    (?:[0-9]+)?(?:<|>>?)|\\^\\^?\n  )\n)",
+          "end": "(?x)\n(?=\\n)\n|\n(?!\n  \\s*\n  (?:\n    [\\n);&|]\n  |\n    (?:[0-9]+)?(?:<|>>?)|\\^\\^?\n  )\n)",
           "patterns": [
             {
               "name": "invalid.illegal.function-call.fish",
@@ -279,8 +279,8 @@
           "end": "(?=[\\n)#;&])",
           "patterns": [
             {
-              "begin": "(?x)\n(?# Negative lookahead for whitespace, comments, piping)\n(?!\n  \\s|\\#|(?:(?:[0-9]+)?(?:<|>>?)|\\^\\^?)?\\|\n)",
-              "end": "(?x)\n(?# Look ahead for operators after whitespace)\n(?=\\s*\n  (?:\n    (?# Find a control operator)\n    [\\n)#;&]\n  |\n    (?# Find a pipe operator)\n    (?:(?:[0-9]+)?(?:<|>>?)|\\^\\^?)?\\|\n  )\n)",
+              "begin": "(?x)\n(?!\n  \\s|\\#|(?:(?:[0-9]+)?(?:<|>>?)|\\^\\^?)?\\|\n)",
+              "end": "(?x)\n(?=\\s*\n  (?:\n    [\\n)#;&]\n  |\n    (?:(?:[0-9]+)?(?:<|>>?)|\\^\\^?)?\\|\n  )\n)",
               "patterns": [
                 {
                   "include": "#command-call-meta"
@@ -291,7 +291,7 @@
               ]
             },
             {
-              "begin": "(?x)\n(?# Look ahead for piping)\n(?=\n  (?:(?:[0-9]+)?(?:<|>>?)|\\^\\^?)?\\|\n)",
+              "begin": "(?x)\n(?=\n  (?:(?:[0-9]+)?(?:<|>>?)|\\^\\^?)?\\|\n)",
               "end": "(?=[\\n)#;&])",
               "patterns": [
                 {
@@ -343,13 +343,13 @@
     "command-call-meta": {
       "patterns": [
         {
-          "begin": "(?x)\n(builtin|command|exec)\\b\n(?# Look ahead for control operations after whitespace)\n(?!\\s*\n  (?:\n    (?# Find simple control operations)\n    [\\n)#;&|]\n  |\n    (?# Find redirection, which may be into a pipe but we don't care)\n    (?:[0-9]+)?(?:<|>>?)|\\^\\^?\n  |\n    (?# Find options)\n    -\n  )\n)",
+          "begin": "(?x)\n(builtin|command|exec)\\b\n(?!\\s*\n  (?:\n    [\\n)#;&|]\n  |\n    (?:[0-9]+)?(?:<|>>?)|\\^\\^?\n  |\n    -\n  )\n)",
           "beginCaptures": {
             "1": {
               "name": "meta.function-call.name.fish support.function.fish meta.string.unquoted.fish"
             }
           },
-          "end": "(?x)\n(?# Look ahead for control operations after whitespace)\n(?=\\s*\n  (?:\n    (?# Find simple control operations)\n    [\\n)#;&]\n  |\n    (?# Find piping)\n    (?:(?:[0-9]+)?(?:<|>>?)|\\^\\^?)?\\|\n  )\n)",
+          "end": "(?x)\n(?=\\s*\n  (?:\n    [\\n)#;&]\n  |\n    (?:(?:[0-9]+)?(?:<|>>?)|\\^\\^?)?\\|\n  )\n)",
           "patterns": [
             {
               "include": "#separator-whitespace"
@@ -398,7 +398,7 @@
       "patterns": [
         {
           "begin": "(?=\\S)",
-          "end": "(?x)\n(?# Look ahead for operators)\n(?=\n  (?:\n    (?# Find a control operator)\n    [\\n)#;&]\n  |\n    (?# Find a pipe operator)\n    (?:(?:[0-9]+)?(?:<|>>?)|\\^\\^?)?\\|\n  )\n)",
+          "end": "(?x)\n(?=\n  (?:\n    [\\n)#;&]\n  |\n    (?:(?:[0-9]+)?(?:<|>>?)|\\^\\^?)?\\|\n  )\n)",
           "patterns": [
             {
               "begin": "(?![\\s<>^%])",
@@ -489,11 +489,11 @@
             },
             {
               "begin": "(?=[^\\n\\S]+)",
-              "end": "(?x)\n(?# Look ahead for operators)\n(?=\n  (?:\n    (?# Find a control operator)\n    [\\n)#;&]\n  |\n    (?# Find a pipe operator)\n    (?:(?:[0-9]+)?(?:<|>>?)|\\^\\^?)?\\|\n  )\n)",
+              "end": "(?x)\n(?=\n  (?:\n    [\\n)#;&]\n  |\n    (?:(?:[0-9]+)?(?:<|>>?)|\\^\\^?)?\\|\n  )\n)",
               "patterns": [
                 {
                   "begin": "(?!--[\\s);&|<>])",
-                  "end": "(?x)\n(?# Look ahead for operators or the end of options)\n(?=\n  (?:\n    (?# Find a control operator)\n    [\\n)#;&]\n  |\n    (?# Find a pipe operator)\n    (?:(?:[0-9]+)?(?:<|>>?)|\\^\\^?)?\\|\n  |\n    (?# Find a double hyphen)\n    --[\\s);&|<>]\n  )\n)",
+                  "end": "(?x)\n(?=\n  (?:\n    [\\n)#;&]\n  |\n    (?:(?:[0-9]+)?(?:<|>>?)|\\^\\^?)?\\|\n  |\n    --[\\s);&|<>]\n  )\n)",
                   "patterns": [
                     {
                       "include": "#separator-whitespace"
@@ -511,7 +511,7 @@
                 },
                 {
                   "begin": "(?=--[\\s);&|<>])",
-                  "end": "(?x)\n(?# Look ahead for operators)\n(?=\n  (?:\n    (?# Find a control operator)\n    [\\n)#;&]\n  |\n    (?# Find a pipe operator)\n    (?:(?:[0-9]+)?(?:<|>>?)|\\^\\^?)?\\|\n  )\n)",
+                  "end": "(?x)\n(?=\n  (?:\n    [\\n)#;&]\n  |\n    (?:(?:[0-9]+)?(?:<|>>?)|\\^\\^?)?\\|\n  )\n)",
                   "patterns": [
                     {
                       "begin": "(?=--[\\s);&|<>])",
@@ -524,7 +524,7 @@
                     },
                     {
                       "begin": "(?=\\s)",
-                      "end": "(?x)\n(?# Look ahead for operators)\n(?=\n  (?:\n    (?# Find a control operator)\n    [\\n)#;&]\n  |\n    (?# Find a pipe operator)\n    (?:(?:[0-9]+)?(?:<|>>?)|\\^\\^?)?\\|\n  )\n)",
+                      "end": "(?x)\n(?=\n  (?:\n    [\\n)#;&]\n  |\n    (?:(?:[0-9]+)?(?:<|>>?)|\\^\\^?)?\\|\n  )\n)",
                       "patterns": [
                         {
                           "include": "#separator-whitespace"
@@ -855,7 +855,7 @@
           "patterns": [
             {
               "begin": "(?=function)",
-              "end": "(?x)\n(?# Look ahead for operators)\n(?=\n  (?:\n    (?# Find a control operator)\n    [\\n)#;&|]\n  |\n    (?# Find a redirect or pipe operator)\n    (?:(?:[0-9]+)?(?:<|>>?)|\\^\\^?)\n  )\n)",
+              "end": "(?x)\n(?=\n  (?:\n    [\\n)#;&|]\n  |\n    (?:(?:[0-9]+)?(?:<|>>?)|\\^\\^?)\n  )\n)",
               "patterns": [
                 {
                   "begin": "(function)\\s+",
@@ -897,7 +897,7 @@
                 },
                 {
                   "begin": "(?=[^\\n\\S])",
-                  "end": "(?x)\n(?# Look ahead for operators)\n(?=\n  (?:\n    (?# Find a control operator)\n    [\\n)#;&|]\n  |\n    (?# Find a redirect or pipe operator)\n    (?:(?:[0-9]+)?(?:<|>>?)|\\^\\^?)\n  )\n)",
+                  "end": "(?x)\n(?=\n  (?:\n    [\\n)#;&|]\n  |\n    (?:(?:[0-9]+)?(?:<|>>?)|\\^\\^?)\n  )\n)",
                   "patterns": [
                     {
                       "include": "#separator-whitespace"

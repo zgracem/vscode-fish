@@ -4,4 +4,3 @@ walk(
       del(.comment) else . end
   else . end
 )
-| . | .uuid="73fe8880-b0d7-4073-8543-e923d65dad79"
