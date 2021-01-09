@@ -5,9 +5,18 @@
     "version": "0.5.2",
     "author": "Z. Grace Moreau",
     "publisher": "zgm",
+    "homepage": "https://github.com/zgracem/vscode-fish#readme",
+    "license": "MIT",
     "repository": {
         "type": "git",
         "url": "https://github.com/zgracem/vscode-fish"
+    },
+    "bugs": {
+        "url": "https://github.com/zgracem/vscode-fish/issues"
+    },
+    "galleryBanner": {
+        "color": "#4d0099",
+        "theme": "light"
     },
     "icon": "images/fish.png",
     "engines": {

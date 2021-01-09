@@ -1,9 +1,9 @@
 _scratch/
 .vscode/
-node_modules/
 dist/
 images/*.acorn
 src/
+syntaxes/*.yaml
 vendor/
 .gitignore
 .gitmodules
