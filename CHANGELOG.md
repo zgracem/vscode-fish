@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.5.3
+
+- Renamed new syntax to "Universal fish variables" so that typing `Cmd+K`,
+  `Cmd+M`, `fis`… doesn't autocomplete to `fish_variables` first.
 ## 0.5.2
 
 - Add syntax highlighting for `fish_variables` (and legacy `fishd.*`) files.

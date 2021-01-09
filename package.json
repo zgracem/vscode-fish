@@ -39,6 +39,9 @@
             },
             {
                 "id": "fish_variables",
+                "aliases": [
+                    "Universal fish variables"
+                ],
                 "filenames": [
                     "fish_variables"
                 ],
