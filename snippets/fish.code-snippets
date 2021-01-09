@@ -5,52 +5,52 @@
       "#!/usr/bin/env ${1:fish}"
     ]
   },
-  "begin … end block": {
+  "begin … end block": {
     "prefix": "begin",
     "body": [
       "begin",
-      "\t${0:# commands}",
+      "\t$0",
       "end"
     ]
   },
-  "for … in … end block": {
+  "for … in … end block": {
     "prefix": "for",
     "body": [
       "for ${1:varname} in ${2:list}",
-      "\t${0:# commands}",
+      "\t$0",
       "end"
     ]
   },
-  "function … end block": {
+  "function … end block": {
     "prefix": "function",
     "body": [
-      "function ${1:funcname}",
-      "\t${0:# body}",
+      "function ${1:$TM_FILENAME_BASE}",
+      "\t$0",
       "end"
     ]
   },
-  "if … end block": {
+  "if … end block": {
     "prefix": "if",
     "body": [
       "if ${1:test}",
-      "\t${0:# commands}",
+      "\t$0",
       "end"
     ]
   },
-  "switch … case … end block": {
+  "switch … case … end block": {
     "prefix": "switch",
     "body": [
       "switch ${1:value}",
-      "case ${2:condition}",
-      "\t${0:# commands}",
+      "\tcase ${2:condition}",
+      "\t\t$0",
       "end"
     ]
   },
-  "while … end block": {
+  "while … end block": {
     "prefix": "while",
     "body": [
       "while ${1:test}",
-      "\t${0:# commands}",
+      "\t$0",
       "end"
     ]
   }
