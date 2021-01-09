@@ -78,7 +78,7 @@
         "snippets": [
             {
                 "language": "fish",
-                "path": "./snippets/snippets.json"
+                "path": "./snippets/fish.code-snippets"
             }
         ],
         "configurationDefaults": {
