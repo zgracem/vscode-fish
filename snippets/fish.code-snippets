@@ -5,6 +5,14 @@
       "#!/usr/bin/env fish"
     ]
   },
+  "argparse": {
+    "prefix": "argparse",
+    "body": [
+      "argparse ${1:'h/help' 'n/name='} -- \\$argv",
+      "or return"
+    ],
+    "description": "argparse"
+  },
   "begin_block": {
     "prefix": "begin",
     "body": [
