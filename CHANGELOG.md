@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.5.4
+
+- New `argparse` snippet
+
 ## 0.5.3
 
 - Renamed new syntax to "Universal fish variables" so that typing `Cmd+K`,
