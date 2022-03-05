@@ -7,5 +7,18 @@
       "url": "./.vscode/schemas/tmLanguage.json"
     }
   ],
+  "[json]": {
+    "editor.formatOnPaste": false,
+    "editor.formatOnSave": false,
+    "editor.formatOnType": false
+  },
+  "[yaml]": {
+    "editor.formatOnPaste": false,
+    "editor.formatOnSave": false
+  },
+  "yaml.format.bracketSpacing": true,
+  "yaml.format.printWidth": 255,
+  "yaml.format.proseWrap": "preserve",
+  "yaml.format.singleQuote": false,
   "typescript.tsc.autoDetect": "off"
 }
