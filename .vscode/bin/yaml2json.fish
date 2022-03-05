@@ -36,7 +36,12 @@ function inject_schema
     jq '{"$schema":"'$url'"} + .'
 end
 
+function format_json
+    jq '.'
+end
+
 remove_regex_comments syntaxes/fish.tmLanguage.yaml | yaml2json \
+    | format_json \
     >syntaxes/fish.tmLanguage.json
 
 yaml2json syntaxes/fish-markdown-codeblock.tmLanguage.yaml \
