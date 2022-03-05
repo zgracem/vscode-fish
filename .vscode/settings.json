@@ -7,6 +7,7 @@
       "url": "./.vscode/schemas/tmLanguage.json"
     }
   ],
+  "workbench.colorTheme": "Tokyo Night",
   "[json]": {
     "editor.formatOnPaste": false,
     "editor.formatOnSave": false,
