@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.6.0
+
+- New `contains` snippet
+- Forked ST2-era source syntax definition to facilitate future development
+- Improved live indentation and comment formatting
+- Added folding markers
+
 ## 0.5.4
 
 - New `argparse` snippet
