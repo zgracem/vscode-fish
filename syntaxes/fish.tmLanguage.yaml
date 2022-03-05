@@ -10,6 +10,9 @@ uuid: 73fe8880-b0d7-4073-8543-e923d65dad79
 
 firstLineMatch: "^#!.*\\b(fish)\\b"
 
+foldingStartMarker: "(;|^)\\s*(begin|for|function|if|switch|while)\\b.*$"
+foldingStopMarker: "(;|^)\\s*end\\b.*$"
+
 patterns:
   # Base scope - Pick up '#' and "\\\n" before command-call sees them
   # This (and within #line-continuation) should be the only places necessary to capture a comment, as the '#' is treated as a special character whenever it could end a line and used as the end of the command
