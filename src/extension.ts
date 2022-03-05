@@ -51,13 +51,13 @@ export const activate = async (context: ExtensionContext): Promise<any> => {
   context.subscriptions.push(
     vscode.languages.registerDocumentFormattingEditProvider(
       "fish",
-      formattingProviders,
+      formattingEditProvider,
     ),
   );
   context.subscriptions.push(
     vscode.languages.registerDocumentRangeFormattingEditProvider(
       "fish",
-      formattingProviders,
+      formattingRangeEditProvider,
     ),
   );
 };
@@ -75,14 +75,16 @@ const startLinting = (context: ExtensionContext): void => {
     if (isSavedFishDocument(document)) {
       const workspaceFolder = vscode.workspace.getWorkspaceFolder(document.uri);
       try {
+        const conf = vscode.workspace.getConfiguration();
+        const fish = conf.get<string>("fish.path.fish") || "fish";
         const result = await runInWorkspace(workspaceFolder, [
-          "fish",
+          fish,
           "-n",
           document.fileName,
         ]);
         var d = fishOutputToDiagnostics(document, result.stderr);
       } catch (error) {
-        vscode.window.showErrorMessage(error.toString());
+        vscode.window.showErrorMessage((error as any)?.toString());
         diagnostics.delete(document.uri);
         return;
       }
@@ -138,51 +140,46 @@ const fishOutputToDiagnostics = (
  */
 const getFormatRangeEdits = async (
   document: TextDocument,
-  range?: Range,
 ): Promise<ReadonlyArray<TextEdit>> => {
-  const actualRange = document.validateRange(
-    range || new Range(0, 0, Number.MAX_VALUE, Number.MAX_VALUE),
-  );
+  const conf = vscode.workspace.getConfiguration();
+  const fishIndent = conf.get<string>("fish.path.fish_indent") || "fish_indent";
   try {
     var result = await runInWorkspace(
       vscode.workspace.getWorkspaceFolder(document.uri),
-      ["fish_indent"],
-      document.getText(actualRange),
+      [fishIndent],
+      document.getText(),
     );
   } catch (error) {
-    vscode.window.showErrorMessage(`Failed to run fish_indent: ${error}`);
+    vscode.window.showErrorMessage(`Failed to run ${fishIndent}: ${error}`);
     // Re-throw the error to make the promise fail
     throw error;
   }
-  return result.exitCode === 0
-    ? [TextEdit.replace(actualRange, result.stdout)]
-    : [];
+  if (result.exitCode !== 0) {
+    vscode.window.showErrorMessage(
+      `fish_indent failed:\n${result.stdout}\n${result.stderr}`,
+    );
+    return [];
+  }
+  return [
+    new TextEdit(
+      new Range(0, 0, Number.MAX_VALUE, Number.MAX_VALUE),
+      result.stdout,
+    ),
+  ];
 };
 
-/**
- * A type for all formatting providers.
- */
-type FormattingProviders = DocumentFormattingEditProvider &
-  DocumentRangeFormattingEditProvider;
+const formattingEditProvider: DocumentFormattingEditProvider = {
+  provideDocumentFormattingEdits: async (document, _, token) => {
+    const edits = await getFormatRangeEdits(document);
+    return token.isCancellationRequested ? [] : (edits as TextEdit[]);
+  },
+};
 
-/**
- * Formatting providers for fish documents.
- */
-const formattingProviders: FormattingProviders = {
-  provideDocumentFormattingEdits: (document, _, token) =>
-    getFormatRangeEdits(document).then((edits) =>
-      token.isCancellationRequested
-        ? []
-        : // tslint:disable-next-line:readonly-array
-          (edits as TextEdit[]),
-    ),
-  provideDocumentRangeFormattingEdits: (document, range, _, token) =>
-    getFormatRangeEdits(document, range).then((edits) =>
-      token.isCancellationRequested
-        ? []
-        : // tslint:disable-next-line:readonly-array
-          (edits as TextEdit[]),
-    ),
+const formattingRangeEditProvider: DocumentRangeFormattingEditProvider = {
+  provideDocumentRangeFormattingEdits: async (document, _range, _, token) => {
+    const edits = await getFormatRangeEdits(document);
+    return token.isCancellationRequested ? [] : (edits as TextEdit[]);
+  },
 };
 
 /**
@@ -291,7 +288,7 @@ const runInWorkspace = (
       },
     );
     if (stdin) {
-      child.stdin!.end(stdin);
+      child.stdin.end(stdin);
     }
   });
 
