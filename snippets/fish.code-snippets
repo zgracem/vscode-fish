@@ -22,6 +22,11 @@
     ],
     "description": "begin … end"
   },
+  "contains_command": {
+    "prefix": "contains",
+    "body": "contains -- ${1:cat} ${2:$animals}",
+    "description": "contains"
+  },
   "for_in_block": {
     "prefix": "for",
     "body": [
