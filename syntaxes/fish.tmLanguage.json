@@ -1494,7 +1494,7 @@
       "patterns": [
         {
           "name": "variable.language.fish",
-          "match": "(\\$)(_|argv|BROWSER|CDPATH|CMD_DURATION|COLUMNS|fish_ambiguous_width|FISH_DEBUG|FISH_DEBUG_OUTPUT|fish_emoji_width|fish_escape_delay_ms|fish_greeting|fish_handle_reflow|fish_history|fish_key_bindings|fish_kill_signal|fish_killring|fish_pid|fish_trace|fish_user_paths|FISH_VERSION|history|HOME|hostname|IFS|LANG|last_pid|LC_ALL|LC_COLLATE|LC_CTYPE|LC_MESSAGES|LC_MONETARY|LC_NUMERIC|LC_TIME|LINES|PATH|pipestatus|PWD|SHLVL|status|status_generation|umask|USER|version)\\b",
+          "match": "(\\$)(_|argv|BROWSER|CDPATH|CMD_DURATION|COLUMNS|fish_ambiguous_width|FISH_DEBUG|FISH_DEBUG_OUTPUT|fish_emoji_width|fish_escape_delay_ms|fish_greeting|fish_handle_reflow|fish_history|fish_key_bindings|fish_kill_signal|fish_killring|fish_pid|fish_trace|fish_user_paths|FISH_VERSION|history|HOME|hostname|IFS|LANG|last_pid|LC_ALL|LC_COLLATE|LC_CTYPE|LC_MESSAGES|LC_MONETARY|LC_NUMERIC|LC_TIME|LINES|PATH|pipestatus|PWD|SHLVL|status|status_generation|umask|USER|version|__fish_bin_dir|__fish_config_dir|__fish_data_dir|__fish_help_dir|__fish_sysconf_dir|__fish_user_data_dir)\\b",
           "captures": {
             "1": {
               "name": "punctuation.definition.variable.fish"
