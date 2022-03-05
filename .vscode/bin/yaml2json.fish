@@ -36,8 +36,7 @@ function inject_schema
     jq '{"$schema":"'$url'"} + .'
 end
 
-remove_regex_comments vendor/sublime-fish/fish.YAML-tmLanguage | yaml2json \
-    | remove_json_comments | inject_uuid | inject_schema \
+yaml2json syntaxes/fish.tmLanguage.yaml \
     >syntaxes/fish.tmLanguage.json
 
 yaml2json syntaxes/fish-markdown-codeblock.tmLanguage.yaml \

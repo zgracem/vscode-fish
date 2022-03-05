@@ -1,8 +1,4 @@
 {
-  "files.exclude": {
-    "vendor/sublime-fish/*": true,
-    "vendor/sublime-fish/fish.YAML-tmLanguage": false
-  },
   "json.schemas": [
     {
       "fileMatch": [

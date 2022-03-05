@@ -1,4 +1,0 @@
-[submodule "vendor/sublime-fish"]
-	path = vendor/sublime-fish
-	url = git@github.com:Phidica/sublime-fish.git
-	branch = st2
