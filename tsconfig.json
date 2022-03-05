@@ -6,7 +6,7 @@
     "lib": ["es6"],
     "target": "es6",
     "sourceMap": false,
-    "strict": true
+    "strict": false
   },
   "exclude": ["node_modules"]
 }
