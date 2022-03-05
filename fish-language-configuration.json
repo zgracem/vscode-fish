@@ -22,7 +22,7 @@
         ["'", "'"]
     ],
     "indentationRules": {
-        "increaseIndentPattern": "(;|^)\\s*(else|for|function|if|case|while|switch)\\b.*$|^.*\\b(begin)\\s*$",
+        "increaseIndentPattern": "(;|^)\\s*(begin|else|for|function|if|case|while|switch)\\b((?!\\bend\\b).)*$|\\(\\s*$|\\\\$",
         "decreaseIndentPattern": "(;|^)\\s*(case|else|end)\\b.*$"
     },
     "folding": {
@@ -31,5 +31,12 @@
             "start": "^\\s*#\\s*region\\b",
             "end": "^\\s*#\\s*endregion\\b"
         }
-    }
+    },
+    "onEnterRules": [
+        {
+            "beforeText": "^\\s*#",
+            "afterText": ".+",
+            "action": { "indent": "none", "appendText": "# " }
+        }
+    ]
 }
