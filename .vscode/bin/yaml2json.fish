@@ -36,7 +36,7 @@ function inject_schema
     jq '{"$schema":"'$url'"} + .'
 end
 
-yaml2json syntaxes/fish.tmLanguage.yaml \
+remove_regex_comments syntaxes/fish.tmLanguage.yaml | yaml2json \
     >syntaxes/fish.tmLanguage.json
 
 yaml2json syntaxes/fish-markdown-codeblock.tmLanguage.yaml \
