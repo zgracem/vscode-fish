@@ -54,6 +54,17 @@
     ],
     "description": "if … end"
   },
+  "if_else_block": {
+    "prefix": "ifelse",
+    "body": [
+      "if ${1:test}",
+      "\t${2:true}",
+      "else",
+      "\t${3:false}",
+      "end"
+    ],
+    "description": "if … else … end"
+  },
   "switch_case_block": {
     "prefix": "switch",
     "body": [
