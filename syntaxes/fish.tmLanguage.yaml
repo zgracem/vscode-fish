@@ -1107,7 +1107,7 @@ repository:
     patterns:
       - # https://fishshell.com/docs/current/language.html#special-variables
         name: variable.language.fish
-        match: "(\\$)(_|argv|BROWSER|CDPATH|CMD_DURATION|COLUMNS|fish_ambiguous_width|FISH_DEBUG|FISH_DEBUG_OUTPUT|fish_emoji_width|fish_escape_delay_ms|fish_greeting|fish_handle_reflow|fish_history|fish_key_bindings|fish_kill_signal|fish_killring|fish_pid|fish_trace|fish_user_paths|FISH_VERSION|history|HOME|hostname|IFS|LANG|last_pid|LC_ALL|LC_COLLATE|LC_CTYPE|LC_MESSAGES|LC_MONETARY|LC_NUMERIC|LC_TIME|LINES|PATH|pipestatus|PWD|SHLVL|status|status_generation|umask|USER|version|__fish_bin_dir|__fish_config_dir|__fish_data_dir|__fish_help_dir|__fish_sysconf_dir|__fish_user_data_dir)\\b"
+        match: "(\\$)(PATH|CDPATH|FISH_DEBUG|FISH_DEBUG_OUTPUT|LANG|LC_(ALL|COLLATE|CTYPE|MESSAGES|MONETARY|NUMERIC)|fish_color_(normal|command|keyword|quote|redirection|end|error|param|valid_path|option|comment|selection|operator|escape|autosuggestion|cwd|cwd_root|user|host|host_remote|status|cancel|search_match)|fish_ambiguous_width|fish_emoji_width|fish_autosuggestion_enabled|fish_handle_reflow|fish_key_bindings|fish_escape_delay_ms|fish_greeting|fish_history|fish_trace|fish_user_paths|umask|BROWSER|_|argv|CMD_DURATION|COLUMNS|LINES|fish_kill_signal|fish_killring|fish_pid|history|HOME|hostname|IFS|last_pid|PWD|pipestatus|SHLVL|status|status_generation|USER|EUID|version|FISH_VERSION)\\b"
         captures:
           "1": { name: punctuation.definition.variable.fish }
 
