@@ -39,7 +39,7 @@
   "function_block": {
     "prefix": "function",
     "body": [
-      "function ${1:$TM_FILENAME_BASE}",
+      "function ${1:$TM_FILENAME_BASE} ${3:-d ${2:\"Describe the function\"}}",
       "\t$0",
       "end"
     ],
