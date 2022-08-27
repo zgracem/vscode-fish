@@ -65,6 +65,11 @@
     ],
     "description": "if … else … end"
   },
+  "status": {
+    "prefix": "status",
+    "body": "status ${1|is-login,is-interactive,is-block,is-breakpoint,is-command-substitution,is-no-job-control,is-full-job-control,is-interactive-job-control,current-command,filename,basename,dirname,fish-path,function,line-number,stack-trace,job-control,features,test-feature|}",
+    "description": "status"
+  },
   "switch_case_block": {
     "prefix": "switch",
     "body": [
