@@ -1,5 +1,15 @@
 # Change Log
 
+## 0.7.0
+
+- New `if…else` and `status` snippets
+- Added optional `-d|--description` to `function` snippet
+- Internal fish variables (e.g. `$__fish_config_dir`) are now also highlighted
+- Updated syntax definitions to support fish 3.4 syntax, based on latest
+  [Phidica/sublime-fish]
+
+[Phidica/sublime-fish]: https://github.com/Phidica/sublime-fish
+
 ## 0.6.0
 
 - New `contains` snippet
