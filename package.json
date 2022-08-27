@@ -101,6 +101,23 @@
                 "editor.insertSpaces": true,
                 "editor.tabSize": 4
             }
+        },
+        "configuration": {
+            "title": "fish",
+            "properties": {
+                "fish.path.fish": {
+                    "type": "string",
+                    "default": "fish",
+                    "scope": "machine-overridable",
+                    "description": "Path to the `fish` binary."
+                },
+                "fish.path.fish_indent": {
+                    "type": "string",
+                    "default": "fish_indent",
+                    "scope": "machine-overridable",
+                    "description": "Path to the `fish_indent` binary."
+                }
+            }
         }
     },
     "scripts": {

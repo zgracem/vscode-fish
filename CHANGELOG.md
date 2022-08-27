@@ -3,6 +3,9 @@
 ## 0.7.1
 
 - Allow syntax highlighting in restricted mode
+- Added configuration variables from upstream: `fish.path.fish` and
+  `fish.path.fish_indent` can now override the location of the `fish` and
+  `fish_indent` executables in your default PATH
 
 ## 0.7.0
 
