@@ -19,6 +19,12 @@
         "theme": "light"
     },
     "icon": "images/fish.png",
+    "capabilities": {
+        "untrustedWorkspaces": {
+            "supported": "limited",
+            "description": "Syntax highlighting supported"
+        }
+    },
     "engines": {
         "vscode": "^1.65.0"
     },

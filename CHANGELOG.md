@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.7.1
+
+- Allow syntax highlighting in restricted mode
+
 ## 0.7.0
 
 - New `if…else` and `status` snippets
