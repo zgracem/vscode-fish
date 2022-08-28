@@ -131,6 +131,8 @@ repository:
       # This is done in a weird way so that we can mark '&' as invalid instead
       # of letting it naturally close the pipeline scope and be marked as valid
       - begin: (?=[&{{pipe_s}}]|{{redir_w}})
+        # End at newline, ensure no operators or redirection after next
+        # whitespace
         end: (?=\n)|(?!\s*(?:{{op_w_pipe_redir}}))
         patterns:
           - name: invalid.illegal.operator.fish
@@ -175,7 +177,10 @@ repository:
 
               # Look ahead for flow control and piping again
               - begin: (?=&&|\|\||{{pipe_w}})
-                end: (?={{op_w}})
+                end: (&&)|(\|\|)|(?={{op_w}})
+                endCaptures:
+                  "1": { name: meta.function-call.operator.control.double-ampersand.fish keyword.operator.control.fish }
+                  "2": { name: meta.function-call.operator.control.double-bar.fish keyword.operator.control.fish }
                 patterns:
                   # After piping/logic can't be an "and" or "or" that is taking
                   # another command as its parameters. This regex should
@@ -220,7 +225,7 @@ repository:
       # that the command is caught elsewhere as a standard command.
       - begin: (?:builtin|command|exec)\b(?!\s*(?:{{op_w_pipe_redir}}|-))
         beginCaptures:
-          "1": { name: meta.function-call.name.fish support.function.fish meta.string.unquoted.fish }
+          "0": { name: meta.function-call.name.fish support.function.fish meta.string.unquoted.fish }
         end: (?={{op_w_pipe}})
         patterns:
           - include: "#separator-whitespace"
