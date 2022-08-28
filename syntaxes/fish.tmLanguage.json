@@ -22,7 +22,7 @@
       "end": "(?=[[^\\n\\S]\\n\\);&\\|<>])"
     },
     {
-      "name": "invalid.illegal.function-call.fish",
+      "name": "invalid.illegal.operator.fish",
       "match": "\\&"
     },
     {
@@ -90,11 +90,11 @@
           "include": "#line-continuation"
         },
         {
-          "begin": "(?=(and|or)\\b(?!\\s*[\\n)#;-]))",
-          "end": "(?=[\\n)#;&])",
+          "begin": "(?=(and|or)\\b(?!\\s*[\\n\\)#;-]))",
+          "end": "(?=[\\n\\)#]|;|&(?![|>]))",
           "patterns": [
             {
-              "begin": "(and|or)\\b(?!\\s*[\\n);-])",
+              "begin": "(and|or)\\b(?!\\s*[\\n\\);-])",
               "beginCaptures": {
                 "1": {
                   "name": "meta.function-call.name.fish keyword.operator.word.fish meta.string.unquoted.fish"
@@ -106,7 +106,7 @@
                   "include": "#separator-whitespace"
                 },
                 {
-                  "name": "invalid.illegal.function-call.fish",
+                  "name": "invalid.illegal.operator.fish",
                   "match": "\\&"
                 },
                 {
@@ -128,10 +128,10 @@
       "patterns": [
         {
           "begin": "(?=[&\\|]|(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&>>?)",
-          "end": "(?x)\n(?=\\n)\n|\n(?!\n  \\s*\n  (?:\n    [\\n\\)#]|;|&(?![|>])\n  |\n    (?:(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&)?\\|\n    |\n    (?:[0-9]+)?(?:[<>]|>>)\n    |\n    \\^\\^?\n    |\n    &>>?\n  )\n)",
+          "end": "(?=\\n)|(?!\\s*(?:[\\n\\)#]|;|&(?![|>])|(?:(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&)?\\||(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&>>?))",
           "patterns": [
             {
-              "name": "invalid.illegal.function-call.fish",
+              "name": "invalid.illegal.operator.fish",
               "match": "[&\\|]|(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&>>?"
             }
           ]
@@ -145,8 +145,8 @@
           "end": "(?=[\\n\\)#]|;|&(?![|>]))(?!&&)",
           "patterns": [
             {
-              "begin": "(?x)\n(?!\n  [\\s#&]\n  |\n  (?:\n    (?:[0-9]+)?(?:[<>]|>>)\n    |\n    \\^\\^?\n    |\n    &\n  )?\\|\n)",
-              "end": "(?x)\n(?=\\s*\n  [\\n\\)#]|;|&(?![|>])\n|\n  (?:(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&)?\\|\n)",
+              "begin": "(?![\\s#&]|(?:(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&)?\\|)",
+              "end": "(?=[\\n\\)#]|;|&(?![|>])|(?:(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&)?\\|)",
               "patterns": [
                 {
                   "include": "#command-call-meta"
@@ -157,7 +157,7 @@
               ]
             },
             {
-              "begin": "(?x)\n(?=\n  &&|\\|\\|\n  |\n  (?:\n    (?:[0-9]+)?(?:[<>]|>>)\n    |\n    \\^\\^?\n    |\n    &\n  )?\\|\n)",
+              "begin": "(?=&&|\\|\\||(?:(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&)?\\|)",
               "end": "(?=[\\n\\)#]|;|&(?![|>]))(?!&&)",
               "patterns": [
                 {
@@ -201,6 +201,14 @@
           "patterns": [
             {
               "include": "#parameter-common"
+            },
+            {
+              "name": "keyword.operator.assignment.fish",
+              "match": "="
+            },
+            {
+              "name": "variable.parameter.fish meta.string.unquoted.fish",
+              "match": "(?=\\=)"
             }
           ]
         }
@@ -209,13 +217,13 @@
     "command-call-meta": {
       "patterns": [
         {
-          "begin": "(?x)\n(builtin|command|exec)\\b\n(?!\\s*\n  (?:\n    [\\n)#;&|]\n  |\n    (?:[0-9]+)?(?:<|>>?)|\\^\\^?\n  |\n    -\n  )\n)",
+          "begin": "(?:builtin|command|exec)\\b(?!\\s*(?:[\\n\\)#]|;|&(?![|>])|(?:(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&)?\\||(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&>>?|-))",
           "beginCaptures": {
             "1": {
               "name": "meta.function-call.name.fish support.function.fish meta.string.unquoted.fish"
             }
           },
-          "end": "(?x)\n(?=\\s*\n  [\\n\\)#]|;|&(?![|>])\n|\n  (?:(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&)?\\|\n)",
+          "end": "(?=[\\n\\)#]|;|&(?![|>])|(?:(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&)?\\|)",
           "patterns": [
             {
               "include": "#separator-whitespace"
@@ -231,7 +239,7 @@
         {
           "name": "meta.function-call.name.fish support.function.fish meta.string.unquoted.fish",
           "begin": "time\\b",
-          "end": "(?x)\n(?=\\s*\n  [\\n\\)#]|;|&(?![|>])\n|\n  (?:(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&)?\\|\n)",
+          "end": "(?=[\\n\\)#]|;|&(?![|>])|(?:(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&)?\\|)",
           "patterns": [
             {
               "include": "#separator-whitespace"
@@ -286,11 +294,11 @@
       "patterns": [
         {
           "begin": "(?=\\S)",
-          "end": "(?x)\n(?=\\s*\n  [\\n\\)#]|;|&(?![|>])\n|\n  (?:(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&)?\\|\n)",
+          "end": "(?x)\n(?=\n  (?:\n    [\\n)#;&]\n  |\n    (?:(?:[0-9]+)?(?:<|>>?)|\\^\\^?)?\\|\n  )\n)",
           "patterns": [
             {
-              "begin": "(?![\\s<>^%])",
-              "end": "(?=[\\s);&|<>])",
+              "begin": "(?![\\s<>^\\0])",
+              "end": "(?=[[^\\n\\S]\\n\\);&\\|<>])",
               "patterns": [
                 {
                   "include": "#command-call-standard-block"
@@ -299,13 +307,13 @@
                   "begin": "\\[(?=[\\s<>]|\\\\\\n)",
                   "beginCaptures": {
                     "0": {
-                      "name": "meta.function-call.name.fish support.function.test.begin.fish meta.string.unquoted.fish"
+                      "name": "meta.function-call.name.fish support.function.test.begin.fish"
                     }
                   },
-                  "end": "(\\])|([\\n\\);&\\|].*)",
+                  "end": "(\\])|(\\n|[;&)|].*)",
                   "endCaptures": {
                     "1": {
-                      "name": "meta.function-call.name.fish support.function.test.end.fish meta.string.unquoted.fish"
+                      "name": "meta.function-call.name.fish support.function.test.end.fish"
                     },
                     "2": {
                       "name": "invalid.illegal.function-call.fish"
@@ -323,15 +331,11 @@
                     },
                     {
                       "include": "#redirection"
-                    },
-                    {
-                      "name": "meta.function-call.fish invalid.illegal.parameter.fish",
-                      "match": "(?![\\n\\)#]|;|&(?![|>])|(?:(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&)?\\|)."
                     }
                   ]
                 },
                 {
-                  "match": "(?:break|continue|return)(?=[\\s);&|<>])",
+                  "match": "(?:break|continue|return)(?=[[^\\n\\S]\\n\\);&\\|<>])",
                   "captures": {
                     "0": {
                       "name": "meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish"
@@ -340,23 +344,23 @@
                 },
                 {
                   "begin": "(?!\\s)",
-                  "end": "(?=[\\s);&|<>])",
+                  "end": "(?=[[^\\n\\S]\\n\\);&\\|<>])",
                   "patterns": [
                     {
                       "name": "invalid.illegal.function-call.fish",
                       "begin": "(?=\\()",
-                      "end": "(?=[\\s);&|<>])",
+                      "end": "(?=[[^\\n\\S]\\n\\);&\\|<>])",
                       "patterns": [
                         {
                           "begin": "\\(",
-                          "end": "\\)|(?=[\\n);&|<>])"
+                          "end": "\\)|(?=[\\n;&\\|<>])"
                         }
                       ]
                     },
                     {
                       "name": "meta.function-call.name.fish variable.function.fish",
                       "begin": "(?!\\s)",
-                      "end": "(?=[\\s);&(|<>])",
+                      "end": "(?=[[^\\n\\S]\\n\\);&\\|<>(])",
                       "patterns": [
                         {
                           "name": "meta.string.unquoted.fish",
@@ -373,19 +377,18 @@
             },
             {
               "name": "invalid.illegal.function-call.fish",
-              "begin": "\\%",
-              "end": "(?=[\\s);&|<>])"
+              "match": "\\\\0[^[^\\n\\S]\\n\\);&\\|<>]*(?=[[^\\n\\S]\\n\\);&\\|<>])"
             },
             {
               "include": "#redirection"
             },
             {
               "begin": "(?=[^\\n\\S]+)",
-              "end": "(?x)\n(?=\n  [\\n\\)#]|;|&(?![|>])\n|\n  (?:(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&)?\\|\n)",
+              "end": "(?=[\\n\\)#]|;|&(?![|>])|(?:(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&)?\\|)",
               "patterns": [
                 {
-                  "begin": "(?!--[\\s);&|<>])",
-                  "end": "(?x)\n(?=\n  (?:\n    [\\n\\)#]|;|&(?![|>])\n  |\n    (?:(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&)?\\|\n  |\n    --[\\s);&|<>]\n  )\n)",
+                  "begin": "(?!--[[^\\n\\S]\\n\\);&\\|<>])",
+                  "end": "(?x)\n(?=\n  (?:\n    [\\n\\)#]|;|&(?![|>])|(?:(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&)?\\|\n  |\n    --[[^\\n\\S]\\n\\);&\\|<>]\n  )\n)",
                   "patterns": [
                     {
                       "include": "#separator-whitespace"
@@ -402,12 +405,12 @@
                   ]
                 },
                 {
-                  "begin": "(?=--[\\s);&|<>])",
-                  "end": "(?x)\n(?=\n  [\\n\\)#]|;|&(?![|>])\n|\n  (?:(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&)?\\|\n)",
+                  "begin": "(?=--[[^\\n\\S]\\n\\);&\\|<>])",
+                  "end": "(?=[\\n\\)#]|;|&(?![|>])|(?:(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&)?\\|)",
                   "patterns": [
                     {
-                      "begin": "(?=--[\\s);&|<>])",
-                      "end": "(?=[\\s);&|<>])",
+                      "begin": "(?=--[[^\\n\\S]\\n\\);&\\|<>])",
+                      "end": "(?=[[^\\n\\S]\\n\\);&\\|<>])",
                       "patterns": [
                         {
                           "include": "#parameter"
@@ -416,7 +419,7 @@
                     },
                     {
                       "begin": "(?=\\s)",
-                      "end": "(?x)\n(?=\n  [\\n\\)#]|;|&(?![|>])\n|\n  (?:(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&)?\\|\n)",
+                      "end": "(?=[\\n\\)#]|;|&(?![|>])|(?:(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&)?\\|)",
                       "patterns": [
                         {
                           "include": "#separator-whitespace"
@@ -486,8 +489,8 @@
         },
         {
           "name": "meta.block.while.fish",
-          "begin": "(?=while\\s+[^\\s)#;-])",
-          "end": "end(?=$|[\\s);&|<>])",
+          "begin": "(?=while\\s+[^\\n\\)#;-])",
+          "end": "end(?=$|[[^\\n\\S]\\n\\);&\\|<>])",
           "endCaptures": {
             "0": {
               "name": "meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish"
@@ -775,7 +778,7 @@
           "patterns": [
             {
               "begin": "(?=function)",
-              "end": "(?x)\n(?=\n  [\\n\\)#]|;|&(?![|>])\n|\n  (?:(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&)?\\|\n)",
+              "end": "(?=[\\n\\)#]|;|&(?![|>])|(?:(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&)?\\||(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&>>?)",
               "patterns": [
                 {
                   "begin": "(function)\\s+",
@@ -817,7 +820,7 @@
                 },
                 {
                   "begin": "(?=[^\\n\\S])",
-                  "end": "(?x)\n(?=\n  [\\n\\)#]|;|&(?![|>])\n|\n  (?:(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&)?\\|\n)",
+                  "end": "(?=[\\n\\)#]|;|&(?![|>])|(?:(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&)?\\||(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&>>?)",
                   "patterns": [
                     {
                       "include": "#separator-whitespace"
@@ -947,7 +950,6 @@
     "redirection": {
       "patterns": [
         {
-          "name": "meta.function-call.operator.redirection.fish",
           "begin": "(?=(?:[0-9]+(?:<|>>|>)|>>|\\^\\^|[<>^])\\&)",
           "end": "(?=[\\s);&|]|(?:[0-9]+(?:<|>>|>)|>>|\\^\\^|[<>^])(?![&<>^]))",
           "patterns": [
@@ -1020,11 +1022,11 @@
             },
             {
               "name": "meta.function-call.operator.redirection.file-descriptor.fish meta.string.unquoted.fish constant.numeric.file-descriptor.fish",
-              "match": "(?:[0-9]+)(?=$|[\\s);&|<>])"
+              "match": "(?:[0-9]+)(?=$|[[^\\n\\S]\\n\\);&\\|<>])"
             },
             {
               "name": "meta.function-call.operator.redirection.file-descriptor.fish meta.string.unquoted.fish keyword.operator.redirect.close.fish",
-              "match": "(?:-)(?=$|[\\s);&|<>])"
+              "match": "(?:-)(?=$|[[^\\n\\S]\\n\\);&\\|<>])"
             },
             {
               "name": "meta.function-call.operator.redirection.fish invalid.illegal.file-descriptor.fish",
@@ -1033,7 +1035,7 @@
           ]
         },
         {
-          "begin": "(?=(?:[0-9]+(?:<|>>|>)|\\&(?:>>|>)|>>|\\^\\^|[<>^])\\??)",
+          "begin": "(?=(?:[0-9]+(?:<|>>|>)|>>|\\^\\^|[<>^])\\??)",
           "end": "(?=[\\s);&|]|(?:[0-9]+(?:<|>>|>)|>>|\\^\\^|[<>^])[&|])",
           "patterns": [
             {
@@ -1076,15 +1078,15 @@
             {
               "name": "meta.function-call.operator.redirection.fish invalid.illegal.path.fish",
               "begin": "\\{|(?=\\})",
-              "end": "[\\s);&|}]"
+              "end": "[^\\n\\S]|[\\n\\);&\\|]|\\}"
             },
             {
               "name": "meta.function-call.operator.redirection.fish invalid.illegal.path.fish",
-              "match": "[*?]"
+              "match": "[*?]\\S*"
             },
             {
               "name": "meta.function-call.operator.redirection.fish invalid.illegal.path.fish",
-              "match": "(?:[&?]|[0-9]*[<>^]).*$"
+              "match": "[&?]|[0-9]*[<>^]\\S*"
             },
             {
               "name": "meta.function-call.operator.redirection.path.fish meta.string.unquoted.fish keyword.operator.tilde.fish",
@@ -1092,16 +1094,16 @@
             },
             {
               "name": "meta.function-call.operator.redirection.path.fish",
-              "begin": "(?![\\s);&(|<>${}*?])",
-              "end": "(?=[\\s);&(|<>${}*?])",
+              "begin": "(?![[^\\n\\S]\\n\\);&\\|<>(${}*?])",
+              "end": "(?=[[^\\n\\S]\\n\\);&\\|<>(${}*?])",
               "patterns": [
                 {
                   "include": "#string-quoted"
                 },
                 {
                   "name": "meta.string.unquoted.fish",
-                  "begin": "(?![\\s);&(|<>${}*?]|['\"])",
-                  "end": "(?=[\\s);&(|<>${}*?]|['\"])",
+                  "begin": "(?![[^\\n\\S]\\n\\);&\\|<>(${}*?]|['\"])",
+                  "end": "(?=[[^\\n\\S]\\n\\);&\\|<>(${}*?]|['\"])",
                   "patterns": [
                     {
                       "include": "#string-unquoted-patterns-escapes"
@@ -1138,7 +1140,7 @@
       "patterns": [
         {
           "name": "meta.function-call.fish",
-          "match": "(?:[^\\n\\S]+)"
+          "match": "[^\\n\\S]+"
         }
       ]
     },
@@ -1257,7 +1259,7 @@
           "end": "(?=[[^\\n\\S]\\n\\);&\\|<>])",
           "patterns": [
             {
-              "match": "(\\%)[0-9]+(?=$|[[^\\n\\S]\\n\\);&\\|<>])",
+              "match": "(\\\\0)[0-9]+(?=$|[[^\\n\\S]\\n\\);&\\|<>])",
               "captures": {
                 "0": {
                   "name": "meta.function-call.parameter.argument.job-expansion.fish meta.string.unquoted.fish"
@@ -1268,7 +1270,7 @@
               }
             },
             {
-              "match": "(\\%)(self)(?=$|[[^\\n\\S]\\n\\);&\\|<>])",
+              "match": "(\\\\0)(self)(?=$|[[^\\n\\S]\\n\\);&\\|<>])",
               "captures": {
                 "0": {
                   "name": "meta.function-call.parameter.argument.process-expansion.self.fish meta.string.unquoted.fish"
@@ -1282,7 +1284,7 @@
               }
             },
             {
-              "match": "(\\%)(last)(?=$|[[^\\n\\S]\\n\\);&\\|<>])",
+              "match": "(\\\\0)(last)(?=$|[[^\\n\\S]\\n\\);&\\|<>])",
               "captures": {
                 "0": {
                   "name": "meta.function-call.parameter.argument.process-expansion.last.fish meta.string.unquoted.fish"
@@ -1297,7 +1299,7 @@
             },
             {
               "name": "meta.function-call.parameter.argument.process-expansion.other.fish",
-              "begin": "\\%",
+              "begin": "\\\\0",
               "beginCaptures": {
                 "0": {
                   "name": "meta.string.unquoted.fish punctuation.definition.process.fish"
@@ -1448,7 +1450,7 @@
       "patterns": [
         {
           "name": "invalid.illegal.variable-expansion.fish",
-          "match": "\\$(?:(?=[,'\"\\]}\\s);&|])|[^\\w\\$][^$,'\"\\]}\\s);&|]*)"
+          "match": "\\$(?:(?=[,'\"\\]}[^\\n\\S]\\n\\);&\\|<>])|[^\\$\\w][^$,'\"\\]}[^\\n\\S]\\n\\);&\\|<>]*)"
         }
       ]
     },
@@ -1497,7 +1499,7 @@
             },
             {
               "name": "constant.numeric.fish",
-              "match": "(?:[+-]?[0-9]+)(?=[\\s);&|<>]|\\]|\\.\\.)"
+              "match": "[+-]?[0-9]+(?=[[^\\n\\S]\\n\\);&\\|<>\\]]|\\.\\.)"
             },
             {
               "name": "invalid.illegal.index.fish",
@@ -1569,14 +1571,25 @@
           "match": "\\\\[\\n\\\"\\\\$]"
         },
         {
-          "name": "meta.interpolation.command.fish",
-          "match": "(?=\\$\\()",
+          "name": "string.interpolated.dollar.fish",
+          "begin": "\\$\\(",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.shell"
+            }
+          },
+          "end": "\\)",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.shell"
+            }
+          },
           "patterns": [
             {
               "include": "#command-substitution"
             },
             {
-              "include": "#string-quoted-contents"
+              "include": "$self"
             }
           ]
         },
@@ -1642,7 +1655,12 @@
             {
               "name": "meta.braces.literal.non-empty.fish",
               "begin": "(?!\\s)",
-              "end": "(?=[\\s\\}])",
+              "end": "(?=[\\s\\}])|((?:[+-]?[0-9]+\\.?[0-9]*|[+-]?[0-9]*\\.?[0-9]+))(?=$|[\\s\\}])",
+              "endCaptures": {
+                "1": {
+                  "name": "constant.numeric.fish"
+                }
+              },
               "patterns": [
                 {
                   "include": "#command-substitution"
@@ -1655,10 +1673,6 @@
                 },
                 {
                   "include": "#string-unquoted-contents"
-                },
-                {
-                  "name": "constant.numeric.fish",
-                  "match": "(?:[+-]?[0-9]+\\.?[0-9]*|[+-]?[0-9]*\\.?[0-9]+)(?=$|[\\s\\}])"
                 }
               ]
             }
@@ -1672,7 +1686,7 @@
               "name": "punctuation.section.braces.begin.fish"
             }
           },
-          "end": "(\\})|(\\n|[;&)|].*)",
+          "end": "(\\})|(\\).*)",
           "endCaptures": {
             "1": {
               "name": "punctuation.section.braces.end.fish"
@@ -1705,11 +1719,11 @@
             },
             {
               "name": "constant.numeric.fish",
-              "match": "(?:[+-]?)(?:[0-9]+\\.?[0-9]*|[0-9]*\\.?[0-9]+)(?=$|[\\s);&|<>]|\\}|\\,)"
+              "match": "(?:[+-]?[0-9]+\\.?[0-9]*|[+-]?[0-9]*\\.?[0-9]+)(?=$|[[^\\n\\S]\\n\\);&\\|<>]|\\}|\\,)"
             },
             {
-              "begin": "(?![\\s);&|<>'\"])",
-              "end": "(?=[\\s);&|<>'\"]|\\}|\\,)",
+              "begin": "(?![[^\\n\\S]\\n\\);&\\|<>'\"])",
+              "end": "(?=[[^\\n\\S]\\n\\);&\\|<>'\"]|\\}|\\,)",
               "patterns": [
                 {
                   "name": "constant.character.escape.fish",
@@ -1743,61 +1757,11 @@
       "patterns": [
         {
           "name": "constant.character.escape.fish",
-          "match": "(?x)\n\\\\[abefnrtv $\\\\*?#(){}\\[\\]<>^&|;\"']\n| (?# `~` and `%` only *need* to be escaped at the front of a parameter,\n      but are always *treated* as escaped, even within a parameter)\n\\\\[~%]\n| (?# hex ASCII)\n\\\\[xX][0-9A-Fa-f]{1,2}\n| (?# octal)\n\\\\[0-7]{1,3}\n| (?# 16-bit Unicode)\n\\\\u[0-9A-Fa-f]{1,4}\n| (?# 32-bit Unicode)\n\\\\U[0-9A-Fa-f]{1,8}\n| (?# control characters)\n\\\\c[?-~]"
+          "match": "(?x)\n\\\\[abefnrtv $\\\\*?#(){}\\[\\]<>^&|;\"']\n|\n\\\\[~\\0]\n|\n\\\\[xX][0-9A-Fa-f]{1,2}\n|\n\\\\[0-7]{1,3}\n|\n\\\\u[0-9A-Fa-f]{1,4}\n|\n\\\\U[0-9A-Fa-f]{1,8}\n|\n\\\\c[?-~]"
         },
         {
           "name": "constant.character.escape.newline.fish",
           "match": "\\\\\\n"
-        }
-      ]
-    },
-    "command-call-old": {
-      "patterns": [
-        {
-          "match": "(begin|while|if|for|switch|function)\\s*([&\\|<>]+)",
-          "captures": {
-            "1": {
-              "name": "meta.function-call.name.fish variable.function.fish meta.string.unquoted.fish"
-            },
-            "2": {
-              "name": "invalid.illegal.operator.fish"
-            }
-          }
-        },
-        {
-          "match": "(begin)\\s*(\\))",
-          "captures": {
-            "1": {
-              "name": "meta.function-call.name.fish variable.function.fish meta.string.unquoted.fish"
-            },
-            "2": {
-              "name": "invalid.illegal.operator.fish"
-            }
-          }
-        },
-        {
-          "name": "meta.block.begin.fish",
-          "begin": "begin(?=\\s*$|\\s*[\\n;]|\\s+[^\\s-])",
-          "beginCaptures": {
-            "0": {
-              "name": "meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish"
-            }
-          },
-          "end": "end(?=$|[[^\\n\\S]\\n\\);&\\|<>])",
-          "endCaptures": {
-            "0": {
-              "name": "meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish"
-            }
-          }
-        },
-        {
-          "comment": "command short/long options",
-          "match": "\\s(-{1,2}[a-zA-Z_\\-0-9]+|-\\w)\\b",
-          "captures": {
-            "1": {
-              "name": "source.option.fish"
-            }
-          }
         }
       ]
     }

@@ -1,4 +1,5 @@
 ---
+# vim:ft=yaml
 $schema: https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json
 
 # Adapted (incl. comments) from Phidica Veia's syntax def. for Sublime Text:
@@ -26,7 +27,7 @@ patterns:
   # will end immediately if either is seen by its lookahead
   - name: invalid.illegal.function-call.fish
     begin: \)|end
-    end: (?=[[^\n\S]\n\);&\|<>])
+    end: (?=[{{param_sep}}])
 
   # The first character of a pipeline can't be an '&', and the base pipeline
   # scope won't be able to mark it as invalid so we have to do so here
@@ -96,13 +97,13 @@ repository:
       # Within fish 3.0, these two commands are "decorators" and intentionally
       # apply their logic to an entire "job conjunction" which we call a logic
       # pipeline
-      - begin: (?=(and|or)\b(?!\s*[\n\)#;-]))
-        end: (?=[\n\)#]|;|&(?![|>]))
+      - begin: (?=(and|or)\b(?!\s*[{{nl_w}};-]))
+        end: (?={{op_w}})
         patterns:
-          - begin: (and|or)\b(?!\s*[\n\);-])
+          - begin: (and|or)\b(?!\s*[{{nl_s}};-])
             beginCaptures:
               "1": { name: meta.function-call.name.fish keyword.operator.word.fish meta.string.unquoted.fish }
-            end: (?![^\n\S]|\&|\\\n)
+            end: (?!{{ws_sep}}|\&|\\\n)
             patterns:
               - include: "#separator-whitespace"
 
@@ -129,27 +130,27 @@ repository:
       # pipeline
       # This is done in a weird way so that we can mark '&' as invalid instead
       # of letting it naturally close the pipeline scope and be marked as valid
-      - begin: (?=[&\|]|(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&>>?)
-        end: (?=\n)|(?!\s*(?:[\n\)#]|;|&(?![|>])|(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\||(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&>>?))
+      - begin: (?=[&{{pipe_s}}]|{{redir_w}})
+        end: (?=\n)|(?!\s*(?:{{op_w_pipe_redir}}))
         patterns:
           - name: invalid.illegal.operator.fish
-            match: '[&\|]|(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&>>?'
+            match: '[&{{pipe_s}}]|{{redir_w}}'
 
       # Match commands illegal in the main context
       - name: invalid.illegal.function-call.fish
-        match: (?:case|else|end)(?=[[^\n\S]\n\);&\|<>])
+        match: (?:case|else|end)(?=[{{param_sep}}])
 
       # A pipeline may be one or more command calls linked by pipe operators
       # ('|', '2>|', etc) or logic operators ('&&' and '||')
       - begin: (?=[^\s#])
         # The pipeline terminates at the first encounter of any control
         # operator, but not '&&'
-        end: (?=[\n\)#]|;|&(?![|>]))(?!&&)
+        end: (?={{op_w}})(?!&&)
         patterns:
           # Match the command of a pipeline segment
           # Ensure no whitespace, comments, background, piping
-          - begin: (?![\s#&]|(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\|)
-            end: (?=[\n\)#]|;|&(?![|>])|(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\|)
+          - begin: (?![\s#&]|{{pipe_w}})
+            end: (?={{op_w_pipe}})
             patterns:
               # Pick up the command call
               - include: "#command-call-meta"
@@ -157,24 +158,24 @@ repository:
 
           # Look for piping/logic which may lead to a second command, and if it
           # does recurse into the pipeline-segment context again
-          - begin: (?=&&|\|\||(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\|)
-            end: (?=[\n\)#]|;|&(?![|>]))(?!&&)
+          - begin: (?=&&|\|\||{{pipe_w}})
+            end: (?={{op_w}})(?!&&)
             patterns:
               # Check for a malformed pipeline segment; however, since fish 3.0
               # there is allowed to be a newline or comment after these.
               # If a logic operator would be followed by a control operator,
               # mark the logic operator invalid.
               - name: invalid.illegal.operator.fish
-                match: (?:&&|\|\|)(?=\s*[\);&\|])
+                match: (?:&&|\|\|)(?=\s*[\){{op_s}}{{pipe_s}}])
 
               # If pipe would be followed by a control operator, mark the pipe
               # invalid.
               - name: invalid.illegal.operator.fish
-                match: '(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\|(?=\s*[\);&])'
+                match: '{{pipe_w}}(?=\s*[\){{op_s}}])'
 
               # Look ahead for flow control and piping again
-              - begin: (?=&&|\|\||(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\|)
-                end: (?=[\n\)#]|;|&(?![|>]))
+              - begin: (?=&&|\|\||{{pipe_w}})
+                end: (?={{op_w}})
                 patterns:
                   # After piping/logic can't be an "and" or "or" that is taking
                   # another command as its parameters. This regex should
@@ -193,10 +194,10 @@ repository:
     patterns:
       - name: meta.function-call.environment.fish
         # Must start with a valid variable name identifier
-        begin: (?=[\w]+=)
+        begin: (?=[{{id_var}}]+=)
         # Match the rest of the environment set, but mark it invalid if the
         # command call is about to end
-        end: (?=[[^\n\S]\n\);&\|<>])|(?:\S+?|\(.*\))(?=\s*[\n;&\|<>])
+        end: (?=[{{param_sep}}])|(?:\S+?|\(.*\))(?=\s*[\n{{op_s}}{{pipe_s}}{{redir_s}}])
         endCaptures:
           "1": { name: invalid.illegal.function-call.fish }
         patterns:
@@ -217,10 +218,10 @@ repository:
       # is followed by redirection, then the redirection is legal and the command
       # just prints its help text, so in that case we avoid opening this scope so
       # that the command is caught elsewhere as a standard command.
-      - begin: (?:builtin|command|exec)\b(?!\s*(?:[\n\)#]|;|&(?![|>])|(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\||(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&>>?|-))
+      - begin: (?:builtin|command|exec)\b(?!\s*(?:{{op_w_pipe_redir}}|-))
         beginCaptures:
           "1": { name: meta.function-call.name.fish support.function.fish meta.string.unquoted.fish }
-        end: (?=[\n\)#]|;|&(?![|>])|(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\|)
+        end: (?={{op_w_pipe}})
         patterns:
           - include: "#separator-whitespace"
           - include: "#line-continuation"
@@ -234,7 +235,7 @@ repository:
       # location. Something to fix up when you overhaul piping
       - name: meta.function-call.name.fish support.function.fish meta.string.unquoted.fish
         begin: 'time\b'
-        end: (?=[\n\)#]|;|&(?![|>])|(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\|)
+        end: (?={{op_w_pipe}})
         patterns:
           - include: "#separator-whitespace"
           - include: "#line-continuation"
@@ -246,10 +247,10 @@ repository:
       # of execution that just prints help text (ie, with an option or with an
       # explicit or implicit newline), then don't open the scope.
       # Note that both forms require whitespace separation from the next command
-      - begin: (?=(not|!)[^\n\S](?!\s*[\n\)#;-]))
-        end: (?=[\n\)#]|;|&(?![|>]))
+      - begin: (?=(not|!){{ws_sep}}(?!\s*[{{nl_w}};-]))
+        end: (?={{op_w}})
         patterns:
-          - begin: ((not)|(!))(?=[^\n\S](?!\s*[\n\)#;-]))
+          - begin: ((not)|(!))(?={{ws_sep}}(?!\s*[{{nl_w}};-]))
             # Still scoping '!' as a "word" operator, because it isn't as strong
             # as a control operator. It has to be followed by whitespace, ie, it
             # has to be a word!
@@ -257,7 +258,7 @@ repository:
               "1": { name: meta.function-call.name.fish }
               "2": { name: keyword.operator.word.not.fish meta.string.unquoted.fish }
               "3": { name: keyword.operator.word.bang.fish meta.string.unquoted.fish }
-            end: (?![^\n\S]|\&|\\\n)
+            end: (?!{{ws_sep}}|\&|\\\n)
             patterns:
               - include: "#separator-whitespace"
 
@@ -294,15 +295,15 @@ repository:
           # Anonymous scope - A name or block element. If a block is found,
           # everything up to the `end` command is captured here. Note that
           # redirection and process expansion can't start the element
-          - begin: (?![\s<>^\0])
-            end: (?=[[^\n\S]\n\);&\|<>])
+          - begin: (?![\s<>^%])
+            end: (?=[{{param_sep}}])
             patterns:
               # Look for block structures
               - include: "#command-call-standard-block"
 
               # Look for the alternate form of test, which uses a matching pair
               # of `[` `]`
-              - begin: \[(?=[\s<>]|\\\n)
+              - begin: \[(?=[\s{{redir_s}}]|\\\n)
                 beginCaptures:
                   "0":
                     { name: meta.function-call.name.fish support.function.test.begin.fish, }
@@ -321,27 +322,27 @@ repository:
               # the correct scope won't work if they are used within if-blocks)
               # or parameters (because fish does that during execution not
               # parsing)
-              - match: (?:break|continue|return)(?=[[^\n\S]\n\);&\|<>])
+              - match: (?:break|continue|return)(?=[{{param_sep}}])
                 captures:
                   "0": { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
 
               # Anonymous scope - A generic name element
               - begin: (?!\s)
-                end: (?=[[^\n\S]\n\);&\|<>])
+                end: (?=[{{param_sep}}])
                 patterns:
                   # A command name can't contain a command substitution. We match the whole line if no closing parenthesis is found, or until the end of the command name if the command substitution gets closed
                   # fish would match the whole command name invalid if there was a command substitution anywhere in it, but we can't look ahead that effectively
                   - name: invalid.illegal.function-call.fish
                     begin: (?=\()
-                    end: (?=[[^\n\S]\n\);&\|<>])
+                    end: (?=[{{param_sep}}])
                     patterns:
                       - begin: \(
-                        end: \)|(?=[\n;&\|<>])
+                        end: \)|(?=[\n{{op_s}}{{pipe_s}}{{redir_s}}])
 
                   # Otherwise, treat the element as a fraction of a name made of arbitrary strings (which breaks at an escaped newline)
                   - name: meta.function-call.name.fish variable.function.fish
                     begin: (?!\s)
-                    end: (?=[[^\n\S]\n\);&\|<>(])
+                    end: (?=[{{param_sep}}(])
                     patterns:
                       # The string scope explicitly forbids '$' so that the argument rule can pick it up as a variable expansion, but '$' is treated as a literal in command names, so we have to match it separately
                       - name: meta.string.unquoted.fish
@@ -352,7 +353,7 @@ repository:
           # A command name can't begin with a process expansion operator
           # (however the variable expansion operator '$' is allowed)
           - name: invalid.illegal.function-call.fish
-            match: \\0[^[^\n\S]\n\);&\|<>]*(?=[[^\n\S]\n\);&\|<>])
+            match: \%[^{{param_sep}}]*(?=[{{param_sep}}])
 
           # Redirection can immediately follow the command name, without whitespace separation
           - include: "#redirection"
@@ -360,21 +361,21 @@ repository:
           # Anonymous scope - A list of parameter, redirection, or comment
           # elements. We rely on this list being separated from the command name
           # by whitespace
-          - begin: (?=[^\n\S]+)
+          - begin: (?={{ws_sep}}+)
             # Match any whitespace characters that aren't the newline
-            end: (?=[\n\)#]|;|&(?![|>])|(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\|)
+            end: (?={{op_w_pipe}})
             patterns:
               # A list of elements that does not start with an end-of-options parameter
-              - begin: (?!--[[^\n\S]\n\);&\|<>])
+              - begin: (?!--[{{param_sep}}])
                 end: |-
                   (?x)
                   (?# Look ahead for operators or the end of options)
                   (?=
                     (?:
-                      [\n\)#]|;|&(?![|>])|(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\|
+                      {{op_w_pipe}}
                     |
                       (?# Find a double hyphen)
-                      --[[^\n\S]\n\);&\|<>]
+                      --[{{param_sep}}]
                     )
                   )
                 patterns:
@@ -384,18 +385,18 @@ repository:
                   - include: "#parameter"
 
               # A list of elements that starts with an end-of-options parameter
-              - begin: (?=--[[^\n\S]\n\);&\|<>])
-                end: (?=[\n\)#]|;|&(?![|>])|(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\|)
+              - begin: (?=--[{{param_sep}}])
+                end: (?={{op_w_pipe}})
                 patterns:
                   # Contain just the end-of-options parameter and give it the normal scope
-                  - begin: (?=--[[^\n\S]\n\);&\|<>])
-                    end: (?=[[^\n\S]\n\);&\|<>])
+                  - begin: (?=--[{{param_sep}}])
+                    end: (?=[{{param_sep}}])
                     patterns:
                       - include: "#parameter"
 
                   # A list of elements (now forcibly using arguments)
                   - begin: (?=\s)
-                    end: (?=[\n\)#]|;|&(?![|>])|(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\|)
+                    end: (?={{op_w_pipe}})
                     patterns:
                       - include: "#separator-whitespace"
                       - include: "#line-continuation"
@@ -405,7 +406,7 @@ repository:
   command-call-standard-block:
     patterns:
       # Block commands cannot be backgrounded, piped, or redirected
-      - match: (begin|while|if|for|switch|function)\s*([&\|<>]+)
+      - match: (begin|while|if|for|switch|function)\s*([&{{pipe_s}}{{redir_s}}]+)
         captures:
           "1": { name: meta.function-call.name.fish variable.function.fish meta.string.unquoted.fish }
           "2": { name: invalid.illegal.operator.fish }
@@ -423,7 +424,7 @@ repository:
         begin: begin(?=\s*$|\s*[\n;]|\s+[^\s-])
         beginCaptures:
           "0": { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
-        end: end(?=$|[[^\n\S]\n\);&\|<>])
+        end: end(?=$|[{{param_sep}}])
         endCaptures:
           "0": { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
         patterns:
@@ -432,8 +433,8 @@ repository:
       - name: meta.block.while.fish
         # If the command name is followed by a valid string (not anything that
         # closes the scope or a string starting with a '-') then open the scope
-        begin: (?=while\s+[^\n\)#;-])
-        end: end(?=$|[[^\n\S]\n\);&\|<>])
+        begin: (?=while\s+[^{{nl_w}};-])
+        end: end(?=$|[{{param_sep}}])
         endCaptures:
           "0": { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
         patterns:
@@ -442,7 +443,7 @@ repository:
           - begin: while
             beginCaptures:
               "0": { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
-            end: (?=[[\n\)#]|;|&(?![|>])])
+            end: (?=[{{op_w}}])
             patterns:
               - include: "#line-continuation"
               - include: "#pipeline"
@@ -454,15 +455,15 @@ repository:
             beginCaptures:
               "1": { name: meta.function-call.operator.control.newline.fish }
               "2": { name: meta.function-call.operator.control.semicolon.fish keyword.operator.control.fish }
-            end: (?=end(?:$|[[^\n\S]\n\);&\|<>]))
+            end: (?=end(?:$|[{{param_sep}}]))
             patterns:
               - include: $self
 
       - name: meta.block.if.fish
         # If the command name is followed by a valid string (not anything that
         # closes the scope or a string starting with a '-') then open the scope
-        begin: (?=if\s+[^\n\)#;-])
-        end: end(?=$|[[^\n\S]\n\);&\|<>])
+        begin: (?=if\s+[^{{nl_w}};-])
+        end: end(?=$|[{{param_sep}}])
         endCaptures:
           "0": { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
         patterns:
@@ -472,10 +473,10 @@ repository:
           - include: "#command-call-standard-block-if-internal"
 
       - name: meta.block.for-in.fish
-        begin: (?=for\s+[^\n\)#;-])
+        begin: (?=for\s+[^{{nl_w}};-])
         # If the command name is followed by a valid string (not anything that
         # closes the scope or a string starting with a '-') then open the scope
-        end: end(?=$|[[^\n\S]\n\);&\|<>])
+        end: end(?=$|[{{param_sep}}])
         endCaptures:
           "0": { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
         patterns:
@@ -491,8 +492,8 @@ repository:
               "0": { name: meta.function-call.fish }
             patterns:
               - name: meta.function-call.parameter.argument.fish
-                begin: (?![[^\n\S]\n\);&\|<>])
-                end: (?=[[^\n\S]\n\);&\|<>])
+                begin: (?![{{param_sep}}])
+                end: (?=[{{param_sep}}])
                 patterns:
                   - include: "#line-continuation" # Eats whitespace on next line!
 
@@ -508,7 +509,7 @@ repository:
 
                   # The only unquoted string should be a valid variable name identifier
                   - name: meta.string.unquoted.fish
-                    match: '\w'
+                    match: '{{id_var}}'
 
                   # If we get to here, we have an illegal character for variables
                   - name: invalid.illegal.string.fish
@@ -528,7 +529,7 @@ repository:
           - begin: in(?=\s)
             beginCaptures:
               "0": { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
-            end: (?=[\n\)#]|;|&(?![|>])|\|)
+            end: (?={{op_w}}|{{pipe_s}})
             patterns:
               - include: "#separator-whitespace"
               - include: "#line-continuation"
@@ -541,7 +542,7 @@ repository:
             beginCaptures:
               "1": { name: meta.function-call.operator.control.newline.fish }
               "2": { name: meta.function-call.operator.control.semicolon.fish keyword.operator.control.fish }
-            end: (?=end(?:$|[[^\n\S]\n\);&\|<>]))
+            end: (?=end(?:$|[{{param_sep}}]))
             patterns:
               - include: $self
 
@@ -553,17 +554,17 @@ repository:
           - include: "#separator-whitespace"
 
       - name: meta.block.switch.fish
-        begin: (?=switch\s+[^\n\)#;-])
+        begin: (?=switch\s+[^{{nl_w}};-])
         # If the command name is followed by a valid string (not anything that
         # closes the scope or a string starting with a '-') then open the scope
-        end: end(?=$|[[^\n\S]\n\);&\|<>])
+        end: end(?=$|[{{param_sep}}])
         endCaptures:
           "0": { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
         patterns:
           # Anonymous scope - Match the valid part of the switch statement, then
           # look for an invalid part
           - begin: (?=switch)
-            end: (?=[\n\)#;])
+            end: (?=[{{nl_w}};])
             patterns:
               # Anonymous scope - Capture the command name we know is there,
               # include a single instance of a parameter (the value), and end
@@ -572,7 +573,7 @@ repository:
                 beginCaptures:
                   "1": { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
                   "2": { name: meta.function-call.fish }
-                end: (?=[[^\n\S]\n\);&\|<>])
+                end: (?=[{{param_sep}}])
                 patterns:
                   - include: "#line-continuation" # Eats whitespace on next line!
                   - include: "#parameter-argument"
@@ -588,7 +589,7 @@ repository:
               - begin: \s+
                 beginCaptures:
                   "0": { name: meta.function-call.fish }
-                end: (?=[\n\)#;])
+                end: (?=[{{nl_w}};])
                 patterns:
                   - name: invalid.illegal.string.fish
                     match: \S+?
@@ -600,16 +601,16 @@ repository:
             beginCaptures:
               "1": { name: meta.function-call.operator.control.fish }
               "2": { name: meta.function-call.operator.control.fish keyword.operator.control.fish }
-            end: (?=end(?:$|[[^\n\S]\n\);&\|<>]))
+            end: (?=end(?:$|[{{param_sep}}]))
             patterns:
               # Anonymous scope - Capture the command name which might be there,
               # include an arbitrary number of arguments, and end when the
               # control operator is captured. Base scope further down handles
               # any invalid operators used to end the scope
-              - begin: case(?=[[^\n\S]\n\);&])
+              - begin: case(?=[{{ws_sep}}{{nl_s}}{{op_s}}])
                 beginCaptures:
                   "0": { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
-                end: (\n)|(;)|(?=[)#&\|]|(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&>>?)
+                end: (\n)|(;)|(?=[)#&{{pipe_s}}]|{{redir_w}})
                 endCaptures:
                   "1": { name: meta.function-call.operator.control.newline.fish }
                   "2": { name: meta.function-call.operator.control.semicolon.fish keyword.operator.control.fish }
@@ -621,17 +622,17 @@ repository:
               - include: $self
 
       - name: meta.block.function.fish
-        begin: (?=function\s+[^\n\)#;-])
+        begin: (?=function\s+[^{{nl_w}};-])
         # If the command name is followed by a valid string (not anything that
         # closes the scope or a string starting with a '-') then open the scope
-        end: end(?=$|[[^\n\S]\n\);&\|<>])
+        end: end(?=$|[{{param_sep}}])
         endCaptures:
           "0": { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
         patterns:
           # Anonymous scope - Match the defined name of the function statement,
           # then look for further parameters
           - begin: (?=function)
-            end: (?=[\n\)#]|;|&(?![|>])|(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\||(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&>>?)
+            end: (?={{op_w_pipe_redir}})
             patterns:
               # Anonymous scope - Capture the command name we know is there,
               # include a single instance of a parameter (the value), and end
@@ -640,7 +641,7 @@ repository:
                 beginCaptures:
                   "0": { name: meta.function-call.name.fish }
                   "1": { name: keyword.control.conditional.fish meta.string.unquoted.fish }
-                end: (?=[[^\n\S]\n\);&\|<>])
+                end: (?=[{{param_sep}}])
                 patterns:
                   - include: "#line-continuation" # Eats whitespace on next line!
 
@@ -651,20 +652,20 @@ repository:
                   # Anonymous scope - Start when an escaped newline isn't
                   # present, and end when whitespace or an operator is seen
                   - begin: (?!\\\n)
-                    end: (?=[[^\n\S]\n\);&\|<>])
+                    end: (?=[{{param_sep}}])
                     patterns:
                       # This is all the usual things a parameter is allowed to
                       # contain
                       - name: meta.function-call.parameter.argument.fish entity.name.function.fish
-                        begin: (?![[^\n\S]\n\)])
-                        end: (?=[[^\n\S]\n\);&\|<>])
+                        begin: (?![{{ws_sep}}{{nl_s}}])
+                        end: (?=[{{param_sep}}])
                         patterns:
                           - include: "#parameter-common"
 
               # Anonymous scope - Capture whitespace which might be there, then
               # match anything normal for a command call, except redirections!
-              - begin: (?=[^\n\S])
-                end: (?=[\n\)#]|;|&(?![|>])|(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\||(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&>>?)
+              - begin: (?={{ws_sep}})
+                end: (?={{op_w_pipe_redir}})
                 patterns:
                   - include: "#separator-whitespace"
                   - include: "#line-continuation"
@@ -673,11 +674,11 @@ repository:
           # Anonymous scope - Capture the operator we know is there, include the
           # base scope, and end when an `end` command is seen. Base scope
           # handles any invalid operators
-          - begin: (\n)|(;)|(?=[)#&\|]|(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&>>?)
+          - begin: (\n)|(;)|(?=[)#&{{pipe_s}}]|{{redir_w}})
             beginCaptures:
               "1": { name: meta.function-call.operator.control.newline.fish }
               "2": { name: meta.function-call.operator.control.semicolon.fish keyword.operator.control.fish }
-            end: (?=end(?:$|[[^\n\S]\n\);&\|<>]))
+            end: (?=end(?:$|[{{param_sep}}]))
             patterns:
               - include: $self
 
@@ -691,7 +692,7 @@ repository:
       # Anonymous scope - Capture an `if` and the command up to the control
       # operator, then capture from the control operator indefinitely.
       - begin: (?=if(?:\s*\n|\s+[^\s;]))
-        end: (?=end(?:$|[[^\n\S]\n\);&\|<>]))
+        end: (?=end(?:$|[{{param_sep}}]))
         patterns:
           # Anonymous scope - Match the command name we know is there, include a
           # single instance of a pipeline, and end when a control operator is
@@ -699,7 +700,7 @@ repository:
           - begin: if
             beginCaptures:
               "0": { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
-            end: (?=[\n#;&])
+            end: (?=[\n#{{op_s}}])
             patterns:
               - include: "#line-continuation"
               - include: "#pipeline"
@@ -711,27 +712,27 @@ repository:
             beginCaptures:
               "1": { name: meta.function-call.operator.control.newline.fish }
               "2": { name: meta.function-call.operator.control.semicolon.fish keyword.operator.control.fish }
-            end: '(?=end(?:$|[[^\n\S]\n\);&\|<>]))'
+            end: '(?=end(?:$|[{{param_sep}}]))'
             patterns:
               # Anonymous scope - Capture an `else` up to the control operator
               # or the start of an `if` structure, then match from the control
               # operator indefinitely or match an `if` structure
               - begin: (?=else\s*[\s;])
-                end: (?=end(?:$|[[^\n\S]\n\);&\|<>]))
+                end: (?=end(?:$|[{{param_sep}}]))
                 patterns:
                   # Anonymous scope - Match the `else` we know is there and any
                   # comment, and mark anything besides an `if` as illegal
                   - begin: else(?=\s*[\s;])
                     beginCaptures:
                       "0": { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
-                    end: (?=[\n#;&\|]|if(?:\s*\n|\s+[^\s;]))
+                    end: (?=[\n#{{op_s}}{{pipe_s}}]|if(?:\s*\n|\s+[^\s;]))
                     patterns:
                       - include: "#separator-whitespace"
                       - include: "#line-continuation"
 
                       # Anything else is illegal
                       - name: invalid.illegal.string.fish
-                        match: \S+?(?=[\s;&])
+                        match: \S+?(?=[\s{{op_s}}])
 
                   # Anonymous scope - Match the operator which will be there if
                   # no `if` was seen, then include the base scope which marks
@@ -741,7 +742,7 @@ repository:
                     beginCaptures:
                       "1": { name: meta.function-call.operator.control.newline.fish }
                       "2": { name: meta.function-call.operator.control.semicolon.fish keyword.operator.control.fish }
-                    end: (?=end(?:$|[[^\n\S]\n\);&\|<>]))
+                    end: (?=end(?:$|[{{param_sep}}]))
                     patterns:
                       - include: $self
 
@@ -813,13 +814,13 @@ repository:
               meta.function-call.operator.redirection.file-descriptor.fish
               meta.string.unquoted.fish
               constant.numeric.file-descriptor.fish
-            match: (?:[0-9]+)(?=$|[[^\n\S]\n\);&\|<>])
+            match: (?:[0-9]+)(?=$|[{{param_sep}}])
 
           - name:
               meta.function-call.operator.redirection.file-descriptor.fish
               meta.string.unquoted.fish
               keyword.operator.redirect.close.fish
-            match: (?:-)(?=$|[[^\n\S]\n\);&\|<>])
+            match: (?:-)(?=$|[{{param_sep}}])
 
           # Anything else is illegal
           - name: meta.function-call.operator.redirection.fish invalid.illegal.file-descriptor.fish
@@ -859,7 +860,7 @@ repository:
           # A redirection path cannot contain brace expansion
           - name: meta.function-call.operator.redirection.fish invalid.illegal.path.fish
             begin: \{|(?=\})
-            end: '[^\n\S]|[\n\);&\|]|\}'
+            end: '{{ws_sep}}|[{{nl_s}}{{op_s}}{{pipe_s}}]|\}'
 
           # A redirection path cannot contain wildcard expansion
           - name: meta.function-call.operator.redirection.fish invalid.illegal.path.fish
@@ -881,16 +882,16 @@ repository:
           # Use strings to build a file path, but break out if any invalid
           # elements or elements that wouldn't form a literal path are encountered
           - name: meta.function-call.operator.redirection.path.fish
-            begin: (?![[^\n\S]\n\);&\|<>(${}*?])
-            end: (?=[[^\n\S]\n\);&\|<>(${}*?])
+            begin: (?![{{param_sep}}(${}*?])
+            end: (?=[{{param_sep}}(${}*?])
             patterns:
               - include: "#string-quoted"
 
               # Should use the same patterns as the above begin/end, but also add
               # the quotes so the #string-quoted rule can handle quoted strings
               - name: meta.string.unquoted.fish
-                begin: (?![[^\n\S]\n\);&\|<>(${}*?]|['"])
-                end: (?=[[^\n\S]\n\);&\|<>(${}*?]|['"])
+                begin: (?![{{param_sep}}(${}*?]|['"])
+                end: (?=[{{param_sep}}(${}*?]|['"])
                 patterns:
                   - include: "#string-unquoted-patterns-escapes"
 
@@ -914,7 +915,7 @@ repository:
     # any whitespace that isn't a newline, practically meaning spaces or tabs
     patterns:
       - name: meta.function-call.fish
-        match: '[^\n\S]+'
+        match: '{{ws_sep}}+'
 
   parameter:
     patterns:
@@ -953,13 +954,13 @@ repository:
       # Long option (parameter starting with two hyphens)
       - name: meta.function-call.parameter.option.long.fish variable.parameter.fish
         begin: (?=--)
-        end: (?=[[^\n\S]\n\);&\|<>])
+        end: (?=[{{param_sep}}])
         patterns:
           - name: variable.parameter.fish
             begin: --
             beginCaptures:
               "0": { name: punctuation.definition.option.long.begin.fish meta.string.unquoted.fish }
-            end: (?=[[^\n\S]\n\);&\|<>=])
+            end: (?=[{{param_sep}}=])
             patterns:
               # We mimic the parameter-common context but use a tweaked unquoted
               # string pattern which excludes '='
@@ -975,7 +976,7 @@ repository:
 
               - name: meta.string.unquoted.fish
                 begin: (?!['"])
-                end: (?=[[^\n\S]\n\);&\|<>('"$=])
+                end: (?=[{{param_sep}}('"$=])
                 patterns:
                   - include: "#string-unquoted-contents"
 
@@ -983,19 +984,19 @@ repository:
           # numerics
           - name: variable.parameter.fish punctuation.definition.option.long.separator.fish meta.string.unquoted.fish
             begin: =
-            end: (?=[[^\n\S]\n\);&\|<>])
+            end: (?=[{{param_sep}}])
             patterns:
               - name: meta.string.unquoted.fish constant.numeric.fish
-                match: '(?:[+-]?[0-9]+\.?[0-9]*|[+-]?[0-9]*\.?[0-9]+)(?=$|[[^\n\S]\n\);&\|<>])'
+                match: '{{real}}(?=$|[{{param_sep}}])'
 
               - include: "#parameter-common"
 
       # Short option (parameter starting with one hyphen)
       - name: meta.function-call.parameter.option.short.fish variable.parameter.fish
-        begin: -(?=[^[^\n\S]\n\);&\|<>])
+        begin: -(?=[^{{param_sep}}])
         beginCaptures:
           "0": { name: punctuation.definition.option.short.fish meta.string.unquoted.fish }
-        end: (?=[[^\n\S]\n\);&\|<>])
+        end: (?=[{{param_sep}}])
         patterns:
           - include: "#parameter-common"
 
@@ -1006,24 +1007,24 @@ repository:
     # where parameters starting with hyphens are explicitly interpreted as
     # arguments rather than as options.
     patterns:
-      - begin: (?![[^\n\S]\n\);&\|<>^])
-        end: (?=[[^\n\S]\n\);&\|<>])
+      - begin: (?![{{param_sep}}^])
+        end: (?=[{{param_sep}}])
         patterns:
           # Job expansion if the whole argument is an integer
-          - match: (\\0)[0-9]+(?=$|[[^\n\S]\n\);&\|<>])
+          - match: (\%)[0-9]+(?=$|[{{param_sep}}])
             captures:
               "0": { name: meta.function-call.parameter.argument.job-expansion.fish meta.string.unquoted.fish }
               "1": { name: punctuation.definition.job.fish }
 
           # Special process expansions. By a convention that I'm making up,
           # scope them as a type of variable
-          - match: (\\0)(self)(?=$|[[^\n\S]\n\);&\|<>])
+          - match: (\%)(self)(?=$|[{{param_sep}}])
             captures:
               "0": { name: meta.function-call.parameter.argument.process-expansion.self.fish meta.string.unquoted.fish }
               "1": { name: punctuation.definition.process.fish }
               "2": { name: variable.language.fish }
 
-          - match: (\\0)(last)(?=$|[[^\n\S]\n\);&\|<>])
+          - match: (\%)(last)(?=$|[{{param_sep}}])
             captures:
               "0": { name: meta.function-call.parameter.argument.process-expansion.last.fish meta.string.unquoted.fish }
               "1": { name: punctuation.definition.process.fish }
@@ -1031,10 +1032,10 @@ repository:
 
           # Normal process expansion
           - name: meta.function-call.parameter.argument.process-expansion.other.fish
-            begin: \\0
+            begin: \%
             beginCaptures:
               "0": { name: meta.string.unquoted.fish punctuation.definition.process.fish }
-            end: (?=[[^\n\S]\n\);&\|<>])
+            end: (?=[{{param_sep}}])
             patterns:
               - include: "#parameter-common"
 
@@ -1043,7 +1044,7 @@ repository:
           # string-unquoted-patterns context, so that we can ensure it is a
           # string solely of numbers
           - name: meta.function-call.parameter.argument.numeric.fish meta.string.unquoted.fish constant.numeric.fish
-            match: '(?:[+-]?[0-9]+\.?[0-9]*|[+-]?[0-9]*\.?[0-9]+)(?=$|[[^\n\S]\n\);&\|<>])'
+            match: '{{real}}(?=$|[{{param_sep}}])'
 
           # This scope can be used by plugins to locate arguments which don't
           # *start* with command substitution or variable expansion and may
@@ -1053,13 +1054,13 @@ repository:
           # this particular scope name is nontrivial
           - name: meta.function-call.parameter.argument.path.fish
             begin: (?![\s($])
-            end: (?=[[^\n\S]\n\);&\|<>])
+            end: (?=[{{param_sep}}])
             patterns:
               # Home directory expansion only occurs if the '~' is at the front
               # of the argument, so check it first
               - name: meta.string.unquoted.fish keyword.operator.tilde.fish
                 begin: \~
-                end: (?=[[^\n\S]\n\);&\|<>])
+                end: (?=[{{param_sep}}])
                 patterns:
                   - include: "#parameter-common"
 
@@ -1068,7 +1069,7 @@ repository:
           # Use standard parameter patterns for whatever doesn't match the above
           - name: meta.function-call.parameter.argument.fish
             begin: (?!\s)
-            end: (?=[[^\n\S]\n\);&\|<>])
+            end: (?=[{{param_sep}}])
             patterns:
               - include: "#parameter-common"
 
@@ -1128,7 +1129,7 @@ repository:
         beginCaptures:
           "0": { name: punctuation.definition.variable.fish }
         # Variables can only be made of word characters or other variables
-        end: (?=[^\$\w])(?!\\\n)
+        end: (?=[^\${{id_var}}])(?!\\\n)
         patterns:
           - name: constant.character.escape.newline.fish
             match: \\\n
@@ -1141,7 +1142,7 @@ repository:
       # a nonword character, is an error. These boundaries are the same as for
       # meta.string.unquoted.
       - name: invalid.illegal.variable-expansion.fish
-        match: \$(?:(?=[,'"\]}[^\n\S]\n\);&\|<>])|[^\$\w][^$,'"\]}[^\n\S]\n\);&\|<>]*)
+        match: \$(?:(?=[,'"\]}{{param_sep}}])|[^\${{id_var}}][^$,'"\]}{{param_sep}}]*)
 
   variable-builtin:
     patterns:
@@ -1188,7 +1189,7 @@ repository:
           # quotes (after a variable expansion) makes it tricky to decide what
           # is or isn't "unquoted"
           - name: constant.numeric.fish
-            match: '[+-]?[0-9]+(?=[[^\n\S]\n\);&\|<>\]]|\.\.)'
+            match: '{{int}}(?=[{{param_sep}}\]]|\.\.)'
 
           # Anything else is invalid
           - name: invalid.illegal.index.fish
@@ -1251,9 +1252,9 @@ repository:
       - name: meta.string.unquoted.fish
         # Begin unquoted string if not whitespace, control operator, quoted
         # string, or variable expansion
-        begin: (?![[^\n\S]\n\);&\|<>('"$])
+        begin: (?![{{param_sep}}('"$])
         # End unquoted string at anything that can't be in one
-        end: (?=[[^\n\S]\n\);&\|<>('"$])
+        end: (?=[{{param_sep}}('"$])
         patterns:
           - include: "#string-unquoted-contents"
 
@@ -1265,7 +1266,7 @@ repository:
       # but print literally, however whitespace will disappear. Braces were not
       # allowed to contain whitespace before, so this structure is invalid prior
       # to fish 3.0
-      - match: (\{)([^\n\S]+)(\})
+      - match: (\{)({{ws_sep}}+)(\})
         captures:
           "1": { name: meta.braces.literal.empty.fish }
           "2": { name: meta.braces.literal.empty.ignored-whitespace.fish }
@@ -1294,7 +1295,7 @@ repository:
           # Wrap up all the normal argument stuff, and re-allow numerics
           - name: meta.braces.literal.non-empty.fish
             begin: (?!\s)
-            end: '(?=[\s\}])|((?:[+-]?[0-9]+\.?[0-9]*|[+-]?[0-9]*\.?[0-9]+))(?=$|[\s\}])'
+            end: '(?=[\s\}])|({{real}})(?=$|[\s\}])'
             endCaptures:
               "1": { name: constant.numeric.fish }
             patterns:
@@ -1332,17 +1333,17 @@ repository:
           # braces into two separate arguments. Don't consume a newline though,
           # so the scope end capture can get it
           - name: invalid.illegal.whitespace.fish
-            match: (?:[^\n\S]+)
+            match: (?:{{ws_sep}}+)
 
           # Manually recreate the string rule with a numeric match, extra logic
           # in unquoted strings, and don't repeat the meta.string.unquoted scope
           - include: "#string-quoted"
 
           - name: constant.numeric.fish
-            match: '(?:[+-]?[0-9]+\.?[0-9]*|[+-]?[0-9]*\.?[0-9]+)(?=$|[[^\n\S]\n\);&\|<>]|\}|\,)'
+            match: '{{real}}(?=$|[{{param_sep}}]|\}|\,)'
 
-          - begin: (?![[^\n\S]\n\);&\|<>'"])
-            end: (?=[[^\n\S]\n\);&\|<>'"]|\}|\,)
+          - begin: (?![{{param_sep}}'"])
+            end: (?=[{{param_sep}}'"]|\}|\,)
             # Begin/end string as before with the addition of breaking at a '}'
             # or ','
             patterns:
@@ -1363,7 +1364,7 @@ repository:
   string-unquoted-contents-escapes:
     patterns:
       # This list follows the order given in official fish documentation.
-      # Technically, `~` and `\0` only *need* to be escaped at the front of a
+      # Technically, `~` and `%` only *need* to be escaped at the front of a
       # parameter, but are always *treated* as escaped, even within a parameter.
       - name: constant.character.escape.fish
         match: |-
@@ -1372,7 +1373,7 @@ repository:
           \\[abefnrtv $\\*?#(){}\[\]<>^&|;"']
           |
           (?# tilde and percent sign)
-          \\[~\0]
+          \\[~%]
           |
           (?# hex ASCII)
           \\[xX][0-9A-Fa-f]{1,2}

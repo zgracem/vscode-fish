@@ -1,0 +1,63 @@
+---
+# Use [A-Za-z0-9_]+ for variable names
+variables:
+  # Separator whitespace - Whitespace that isn't the literal newline
+  # Separates words in a command call
+  ws_sep: '[^\n\S]'
+
+  # Strong newline set - No need to be preceded by whitespace
+  # Terminates pipelines
+  nl_s: \n\) # \n)
+
+  # Weak newline set - Some chars must be preceded by whitespace
+  nl_w: '{{nl_s}}#' # \n)#
+
+  # Strong redirection - No need to be preceded by whitespace
+  # Controls data flow for a single command
+  redir_s: <>
+
+  # (Redirection into file and redirection into pipe use '&' slightly differently...grumble)
+  _redir_base: (?:[0-9]+)?(?:[{{redir_s}}]|>>)|\^\^?
+
+  # Weak redirection - Some chars must be preceded by whitespace
+  # Controls data flow for a single command
+  redir_w: '{{_redir_base}}|&>>?'
+
+  # Strong pipe - No need to be preceded by whitespace
+  # Separates commands in a pipeline
+  pipe_s: \|
+
+  # Weak pipe (may be redirection into pipe) - Some chars must be preceded by whitespace
+  pipe_w: (?:{{_redir_base}}|&)?{{pipe_s}}
+
+  # Strong operator set - No need to be preceded by whitespace
+  # Terminates pipelines
+  op_s: ;&
+
+  # Weak operator set - Some chars must be preceded by whitespace
+  # Terminates pipelines
+  op_w: '[{{nl_w}}]|;|&(?![|>])'
+
+  # Weak operator set, including pipe
+  # Terminates pipelines or separates commands in a pipeline
+  op_w_pipe: '{{op_w}}|{{pipe_w}}'
+
+  # Weak operator set, including redirection
+  # Terminates pipelines or controls data flow for a single command
+  op_w_redir: '{{op_w}}|{{redir_w}}'
+
+  # Weak operator set, including pipe and redirection
+  # Interrupts commands in some way
+  op_w_pipe_redir: '{{op_w}}|{{pipe_w}}|{{redir_w}}'
+
+  # Parameter separators
+  param_sep: '{{ws_sep}}{{nl_s}}{{op_s}}{{pipe_s}}{{redir_s}}' # \s);&|<>
+
+  # Integer number
+  int: '[+-]?[0-9]+'
+
+  # Real (floating-point) number
+  real: (?:{{int}}\.?[0-9]*|[+-]?[0-9]*\.?[0-9]+)
+
+  # Valid characters in a variable name identifier
+  id_var: \w
