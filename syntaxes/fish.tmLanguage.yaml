@@ -38,7 +38,7 @@ patterns:
   # sequences that could be an end if we're actually inside a $self scope right
   # now (`)` and `end`)
   - begin: (?=\S)
-    end: (\n)|(;)|(&)|(?=\)|#|end)
+    end: (\n)|(;)|((?<!&)&(?!&))|(?=\)|#|end)
     endCaptures:
       # Redirection uses the meta.function-call.operator prefix, so we
       # have it here too despite it being redundant
@@ -124,32 +124,29 @@ repository:
     # pipeline, but it does perform checks on what can appear after pipe/logic
     # operators (if they appear) before it will recurse into itself
     patterns:
-      # Match operators (background, pipe, redirect, and logic) which cannot
-      # start a pipeline because they must be consumed within or after a
-      # pipeline
-      # This is done in a weird way so that we can mark '&' as invalid instead
-      # of letting it naturally close the pipeline scope and be marked as valid
+      # Match operators (background, pipe, and redirect) which cannot start a
+      # pipeline because they must be consumed within or after a pipeline
       - begin: (?=[&\|]|(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&>>?)
         # End at newline, ensure no operators or redirection after next
         # whitespace
         end: (?=\n)|(?!\s*(?:[\n\)#]|;|&(?![|>])|(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\||(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&>>?))
         patterns:
           - name: invalid.illegal.operator.fish
-            match: '[&\|]|(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&>>?' # [&\|]|(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&>>?
-            # match: (?:[&|]|(?:[0-9]+)?(?:<|>>?)|\^\^?)
+            # match: '[&\|]|(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&>>?'
+            match: (?:(?<!&)&(?!&)|(?<!\|)\|(?!\|)|(?:[0-9]+)?(?:<|>>?)|\^\^?)
 
       # Match commands illegal in the main context
       - name: invalid.illegal.function-call.fish
         match: (?:case|else|end)(?=[[^\n\S]\n\);&\|<>])
 
-      # A pipeline may be one or more command calls linked by pipe operators
-      # ('|', '2>|', etc) or logic operators ('&&' and '||')
+      # Anonymous scope - A pipeline may be one or more command calls linked by
+      # pipe operators ('|', '2>|', etc) or logic operators ('&&' and '||')
       - begin: (?=[^\s#])
         # The pipeline terminates at the first encounter of any control
         # operator, but not '&&'
         end: (?=[\n\)#]|;|&(?![|>]))(?!&&)
         patterns:
-          # Match the command of a pipeline segment
+          # Anonymous scope - Match the command of a pipeline segment
           # Ensure no whitespace, comments, background, piping
           - begin: (?![\s#&]|(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\|)
             end: (?=[\n\)#]|;|&(?![|>])|(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\|)
@@ -158,38 +155,48 @@ repository:
               - include: "#command-call-meta"
               - include: "#command-call-standard"
 
-          # Look for piping/logic which may lead to a second command, and if it
-          # does recurse into the pipeline-segment context again
+          # Anonymous scope - Look for piping/logic which may lead to a second
+          # command, and if it does recurse into the pipeline-segment context
+          # again
           - begin: (?=&&|\|\||(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\|)
-            end: (?=[\n\)#]|;|&(?![|>]))(?!&&)
+            end: (?=[\n\)#]|;|&(?![|>])) #(?!&&)
             patterns:
-              # Check for a malformed pipeline segment; however, since fish 3.0
-              # there is allowed to be a newline or comment after these.
-              # If a logic operator would be followed by a control operator,
-              # mark the logic operator invalid.
+              # Check for a malformed pipeline segment, however since fish 3.0 there is allowed to be a newline or comment after these
+              # If logic operator would be followed by a control operator mark the logic operator invalid
               - name: invalid.illegal.operator.fish
                 match: (?:&&|\|\|)(?=\s*[\);&\|])
 
-              # If pipe would be followed by a control operator, mark the pipe
-              # invalid.
+              # If pipe would be followed by a control operator mark the pipe invalid
               - name: invalid.illegal.operator.fish
                 match: '(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\|(?=\s*[\);&])'
 
-              - include: "#redirection-to-pipe"
-
-              # Look ahead for flow control and piping again
-              - begin: (?=&&|\|\||(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\|)
+              # Otherwise, say the piping/logic is okay; the tests at the start of pipeline-segment will highlight any invalid commands (eg, redirection)
+              # A pipeline is permitted to continue on the next line with whitespace and unescaped newlines in between (though we can only catch one newline)
+              - begin: |-
+                  (?x)
+                  (?:
+                    ([0-9]+)?([<>]|>>?)
+                    |
+                    (\^\^?)
+                  )?
+                  (\|)
+                captures:
+                  "0": {name: meta.function-call.operator.pipe.fish}
+                  "1": {name: constant.numeric.file-descriptor.fish}
+                  "2": {name: keyword.operator.pipe.redirect.fish}
+                  "3": {name: keyword.operator.pipe.redirect.fish}
+                  "4": {name: keyword.operator.pipe.fish}
                 end: (?=[\n\)#]|;|&(?![|>]))|(?:(&&)|(\|\|))|(?=.)
                 endCaptures:
                   "1": { name: meta.function-call.operator.control.double-ampersand.fish keyword.operator.control.fish }
                   "2": { name: meta.function-call.operator.control.double-bar.fish keyword.operator.control.fish }
                 patterns:
-                  # After piping/logic can't be an "and" or "or" that is taking
-                  # another command as its parameters. This regex should
-                  # resemble the match which seeks a valid "and"/"or" in the
-                  # pipeline context, since the only difference is that here the
-                  # same matched text is instead invalid. We can be a little
-                  # simpler though, and not worry about marking an '&' as
+                  # After a pipe can't be an "and" or "or" that is taking
+                  # another command as its parameters. This match should
+                  # generally be pretty similar to the match which seeks a valid
+                  # "and"/"or" in #pipeline, since the only difference is that
+                  # here the same matched text is instead invalid. We can be a
+                  # little simpler though, and not worry about marking an "&" as
                   # invalid since the word will be instead
                   - name: invalid.illegal.function-call.fish
                     match: (and|or)\b(?!\s*[\n;-])
@@ -204,6 +211,92 @@ repository:
 
                   # Match the next command and any piping/logic which follows it, and so on
                   - include: "#pipeline-segment"
+
+  # pipeline-segment-broken:
+  #   # The pipeline-segment context is agnostic of where it appears in an overall
+  #   # pipeline, but it does perform checks on what can appear after pipe/logic
+  #   # operators (if they appear) before it will recurse into itself
+  #   patterns:
+  #     # Match operators (background, pipe, redirect, and logic) which cannot
+  #     # start a pipeline because they must be consumed within or after a
+  #     # pipeline
+  #     # This is done in a weird way so that we can mark '&' as invalid instead
+  #     # of letting it naturally close the pipeline scope and be marked as valid
+  #     - begin: (?=[&\|]|(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&>>?)
+  #       # End at newline, ensure no operators or redirection after next
+  #       # whitespace
+  #       end: (?=\n)|(?!\s*(?:[\n\)#]|;|&(?![|>])|(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\||(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&>>?))
+  #       patterns:
+  #         - name: invalid.illegal.operator.fish
+  #           match: '[&\|]|(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&>>?' # [&\|]|(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&>>?
+  #           # match: (?:[&|]|(?:[0-9]+)?(?:<|>>?)|\^\^?)
+
+  #     # Match commands illegal in the main context
+  #     - name: invalid.illegal.function-call.fish
+  #       match: (?:case|else|end)(?=[[^\n\S]\n\);&\|<>])
+
+  #     # A pipeline may be one or more command calls linked by pipe operators
+  #     # ('|', '2>|', etc) or logic operators ('&&' and '||')
+  #     - begin: (?=[^\s#])
+  #       # The pipeline terminates at the first encounter of any control
+  #       # operator, but not '&&'
+  #       end: (?=[\n\)#]|;|&(?![|>]))(?!&&)
+  #       patterns:
+  #         # Match the command of a pipeline segment
+  #         # Ensure no whitespace, comments, background, piping
+  #         - begin: (?![\s#&]|(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\|)
+  #           end: (?=[\n\)#]|;|&(?![|>])|(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\|)
+  #           patterns:
+  #             # Pick up the command call
+  #             - include: "#command-call-meta"
+  #             - include: "#command-call-standard"
+
+  #         # Look for piping/logic which may lead to a second command, and if it
+  #         # does recurse into the pipeline-segment context again
+  #         - begin: (?=&&|\|\||(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\|)
+  #           end: (?=[\n\)#]|;|&(?![|>]))(?!&&)
+  #           patterns:
+  #             # Check for a malformed pipeline segment; however, since fish 3.0
+  #             # there is allowed to be a newline or comment after these.
+  #             # If a logic operator would be followed by a control operator,
+  #             # mark the logic operator invalid.
+  #             - name: invalid.illegal.operator.fish
+  #               match: (?:&&|\|\|)(?=\s*[\);&\|])
+
+  #             # If pipe would be followed by a control operator, mark the pipe
+  #             # invalid.
+  #             - name: invalid.illegal.operator.fish
+  #               match: '(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\|(?=\s*[\);&])'
+
+  #             - include: "#redirection-to-pipe"
+
+  #             # Look ahead for flow control and piping again
+  #             - begin: (?=&&|\|\||(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\|)
+  #               end: (?=[\n\)#]|;|&(?![|>]))|(?:(&&)|(\|\|))|(?=.)
+  #               endCaptures:
+  #                 "1": { name: meta.function-call.operator.control.double-ampersand.fish keyword.operator.control.fish }
+  #                 "2": { name: meta.function-call.operator.control.double-bar.fish keyword.operator.control.fish }
+  #               patterns:
+  #                 # After piping/logic can't be an "and" or "or" that is taking
+  #                 # another command as its parameters. This regex should
+  #                 # resemble the match which seeks a valid "and"/"or" in the
+  #                 # pipeline context, since the only difference is that here the
+  #                 # same matched text is instead invalid. We can be a little
+  #                 # simpler though, and not worry about marking an '&' as
+  #                 # invalid since the word will be instead
+  #                 - name: invalid.illegal.function-call.fish
+  #                   match: (and|or)\b(?!\s*[\n;-])
+
+  #                 # Elements that we can consume indefinitely between the piping and
+  #                 # the next pipeline-segment (command call) which follows it
+  #                 - include: "#separator-whitespace"
+  #                 - include: "#line-continuation"
+  #                 - include: "#comment"
+  #                 - name: meta.function-call.operator.control.newline.ignored.fish
+  #                   match: \n
+
+  #                 # Match the next command and any piping/logic which follows it, and so on
+  #                 - include: "#pipeline-segment"
 
   command-call-environment:
     patterns:
@@ -827,18 +920,17 @@ repository:
 
           - name:
               meta.function-call.operator.redirection.file-descriptor.fish
-              meta.string.unquoted.fish
-              constant.numeric.file-descriptor.fish
-            match: (?:[0-9]+)(?=$|[[^\n\S]\n\);&\|<>])
-
+              meta.string.unquoted.fish constant.numeric.file-descriptor.fish
+            match: (?:[0-9]+)(?=$|[\s);&|<>])
           - name:
               meta.function-call.operator.redirection.file-descriptor.fish
-              meta.string.unquoted.fish
-              keyword.operator.redirect.close.fish
-            match: (?:-)(?=$|[[^\n\S]\n\);&\|<>])
+              meta.string.unquoted.fish keyword.operator.redirect.close.fish
+            match: (?:-)(?=$|[\s);&|<>])
 
           # Anything else is illegal
-          - name: meta.function-call.operator.redirection.fish invalid.illegal.file-descriptor.fish
+          - name:
+              meta.function-call.operator.redirection.fish
+              invalid.illegal.file-descriptor.fish
             match: (?:\S+)
 
       # This redirection pattern connects a file descriptor (either explicit or
@@ -873,17 +965,23 @@ repository:
           - include: "#line-continuation"
 
           # A redirection path cannot contain brace expansion
-          - name: meta.function-call.operator.redirection.fish invalid.illegal.path.fish
+          - name:
+              meta.function-call.operator.redirection.fish
+              invalid.illegal.path.fish
             begin: \{|(?=\})
             end: '[^\n\S]|[\n\);&\|]|\}'
 
           # A redirection path cannot contain wildcard expansion
-          - name: meta.function-call.operator.redirection.fish invalid.illegal.path.fish
+          - name:
+              meta.function-call.operator.redirection.fish
+              invalid.illegal.path.fish
             match: '[*?]\S*'
 
           # Check for characters which are associated with redirection, so path
           # cannot begin with them
-          - name: meta.function-call.operator.redirection.fish invalid.illegal.path.fish
+          - name:
+              meta.function-call.operator.redirection.fish
+              invalid.illegal.path.fish
             match: '[&?]|[0-9]*[<>^]\S*'
 
           # We reserve the meta.redirection.path scope only for redirection paths
@@ -897,16 +995,16 @@ repository:
           # Use strings to build a file path, but break out if any invalid
           # elements or elements that wouldn't form a literal path are encountered
           - name: meta.function-call.operator.redirection.path.fish
-            begin: (?![[^\n\S]\n\);&\|<>(${}*?])
-            end: (?=[[^\n\S]\n\);&\|<>(${}*?])
+            begin: (?![\s);&(|<>${}*?])
+            end: (?=[\s);&(|<>${}*?])
             patterns:
               - include: "#string-quoted"
 
               # Should use the same patterns as the above begin/end, but also add
               # the quotes so the #string-quoted rule can handle quoted strings
               - name: meta.string.unquoted.fish
-                begin: (?![[^\n\S]\n\);&\|<>(${}*?]|['"])
-                end: (?=[[^\n\S]\n\);&\|<>(${}*?]|['"])
+                begin: (?![\s);&(|<>${}*?]|['"])
+                end: (?=[\s);&(|<>${}*?]|['"])
                 patterns:
                   - include: "#string-unquoted-patterns-escapes"
 
@@ -925,69 +1023,227 @@ repository:
             patterns:
               - include: "#variable-expansion"
 
-  redirection-to-pipe:
-    patterns:
-      # Mysteriously, the explicit "0<" form isn't allowed (since at least 2.7)
-      # Raises the question of what this is actually doing...
-      - name: meta.function-call.operator.pipe.stdin.implicit.fish
-        begin: (?=<)
-        end: '(<)|(\|)' # redirection-common-op-read / pipe-common
-        endCaptures:
-          "1": { name: keyword.operator.redirect.read.fish }
-          "2": { name: keyword.operator.pipe.fish }
+  # redirection-broken:
+  #   patterns:
+  #     # This redirection pattern connects a file descriptor (either explicit or
+  #     # implied) to another file descriptor. As the '&' is necessary to denote the
+  #     # target file descriptor, this is a more strict pattern match and must be
+  #     # attended to first
+  #     - begin: (?=(?:[0-9]+(?:<|>>|>)|>>|\^\^|[<>^])\&)
+  #       # Begin at any of the redirections valid for a file descriptor (the '&'
+  #       # must be present). Note that the stderr redirect operator '^' cannot be
+  #       # preceded by a file descriptor. The parameter and argument rules are in
+  #       # charge of preventing '^' being treated as a redirection when it appears
+  #       # in the middle of a word
+  #       end: (?=[\s);&|]|(?:[0-9]+(?:<|>>|>)|>>|\^\^|[<>^])(?![&<>^]))
+  #       # End at anything that would end a parameter, including redirections *if*
+  #       # they are *not* this same type of redirection (ie, have an '&'), in which
+  #       # case this scope stays open and we match the next one. The negative
+  #       # lookahead for <>^ at the end is to keep ST2 happy (not hanging)
+  #       patterns:
+  #         - begin: (?:([0-9]+)(<|>>|>)|(>>|\^\^|[<>^]))(\&)\s*
+  #           beginCaptures:
+  #             "0": { name: meta.function-call.operator.redirection.fish }
+  #             "1": { name: meta.string.unquoted.fish constant.numeric.file-descriptor.fish }
+  #             "2": { name: keyword.operator.redirect.fish }
+  #             "3": { name: keyword.operator.redirect.fish }
+  #             "4": { name: keyword.operator.redirect.dereference.fish }
+  #           end: ([#&]\S*)|(?![&\\])
+  #           endCaptures:
+  #             "0": { name: meta.function-call.operator.redirection.fish }
+  #             "1": { name: invalid.illegal.file-descriptor.fish }
+  #           # We have to try and catch an '&' here because if it is seen by the
+  #           # outer end match then it will be considered a valid operator and the
+  #           # redirection scope will immediately terminate
+  #           patterns:
+  #             - include: "#line-continuation" # Eats whitespace on next line
 
-      # Append form (">>") is illegal from 3.1 onwards
-      - name: meta.function-call.operator.pipe.stdout.explicit.fish
-        begin: (?=1>>?|>>?)
-        end: '(>>)(\|)?|(>)(\|)?|([0-9]+)|(?=>>?)' # redirection-common-op-write / redirection-common-lhs / pipe-common
-        endCaptures:
-          "1": {name: keyword.operator.redirect.write.append.fish}
-          "2": {name: meta.function-call.operator.pipe.stdout.implicit.fish keyword.operator.pipe.fish}
-          "3": {name: keyword.operator.redirect.write.truncate.fish}
-          "4": {name: meta.function-call.operator.pipe.stdout.implicit.fish keyword.operator.pipe.fish}
-          "5": {name: meta.string.unquoted.fish constant.numeric.file-descriptor.fish}
+  #         - include: "#line-continuation"
 
-      # Pipe with no redirection in front at all
-      - name: meta.function-call.operator.pipe.stdout.implicit.fish
-        match: (?=\|)
+  #         # Evaluates to a string which may be an integer
+  #         - name: meta.function-call.operator.redirection.fish
+  #           begin: (?=\()
+  #           end: (?!\()
+  #           patterns:
+  #             - include: "#command-substitution"
 
-      # Only the explicit truncate form ("2>") is legal from 3.1 onwards
-      - name: meta.function-call.operator.pipe.stderr.explicit.fish
-        begin: (?=2>>?)
-        end: (>>)|(>)|([0-9]+)|(?=>>?)|(\|) # redirection-common-op-write / redirection-common-lhs / pipe-common
-        endCaptures:
-          "1": {name: keyword.operator.redirect.write.append.fish}
-          "2": {name: keyword.operator.redirect.write.truncate.fish}
-          "3": {name: meta.string.unquoted.fish constant.numeric.file-descriptor.fish}
-          "4": {name: meta.function-call.operator.pipe.stdout.implicit.fish}
-          "5": {name: keyword.operator.pipe.fish}
+  #         # Evaluates to a string which may be an integer
+  #         - name: meta.function-call.operator.redirection.fish
+  #           begin: (?=\$)
+  #           end: (?!\$)
+  #           patterns:
+  #             - include: "#variable-expansion"
 
-      - name: meta.function-call.operator.pipe.stderr.implicit.fish
-        begin: (?=\^\^?)
-        end: (\^\^)|(\^)|(\|) # redirection-common-op-write-caret / pipe-common
-        endCaptures:
-          "1": {name: keyword.operator.redirect.write.append.fish}
-          "2": {name: keyword.operator.redirect.write.truncate.fish}
-          "3": {name: keyword.operator.pipe.fish}
+  #         # May be a quoted integer, which is allowed
+  #         - name: meta.function-call.operator.redirection.fish
+  #           begin: (?=['"])
+  #           end: (?!['"])
+  #           patterns:
+  #             - include: "#string-quoted"
 
-      # From 3.1 we gain access to the std-write form (see notes in redirection-to-file-path-lhs+op)
-      - name: meta.function-call.operator.pipe.std-write.fish
-        begin: (?=\&)
-        end: '(\&)|(\|)' #  / pipe-common
-        endCaptures:
-          "1": { name: meta.string.unquoted.fish constant.numeric.file-descriptor.fish }
-          "2": {name: keyword.operator.pipe.fish}
+  #         - name:
+  #             meta.function-call.operator.redirection.file-descriptor.fish
+  #             meta.string.unquoted.fish
+  #             constant.numeric.file-descriptor.fish
+  #           match: (?:[0-9]+)(?=$|[[^\n\S]\n\);&\|<>])
 
-      # Read ("<") and append form (">>") are illegal from 3.1 onwards
-      - name: meta.function-call.operator.pipe.other.fish
-        begin: (?=[0-9]+(?:<|>>|>))
-        end: '(<)|(>>)|(>)|([0-9]+)|(\|)' # redirection-common-op-read / redirection-common-op-write + redirection-common-lhs / pipe-common
-        endCaptures:
-          "1": { name: keyword.operator.redirect.read.fish }
-          "2": { name: keyword.operator.redirect.write.append.fish }
-          "3": { name: keyword.operator.redirect.write.truncate.fish }
-          "4": { name: meta.string.unquoted.fish constant.numeric.file-descriptor.fish }
-          "5": {name: keyword.operator.pipe.fish}
+  #         - name:
+  #             meta.function-call.operator.redirection.file-descriptor.fish
+  #             meta.string.unquoted.fish
+  #             keyword.operator.redirect.close.fish
+  #           match: (?:-)(?=$|[[^\n\S]\n\);&\|<>])
+
+  #         # Anything else is illegal
+  #         - name: meta.function-call.operator.redirection.fish invalid.illegal.file-descriptor.fish
+  #           match: (?:\S+)
+
+  #     # This redirection pattern connects a file descriptor (either explicit or
+  #     # implied) and a file path
+  #     - begin: (?=(?:[0-9]+(?:<|>>|>)|>>|\^\^|[<>^])\??)
+  #       # Begin at any of the redirections valid for a file path (the '?' may
+  #       # optionally be used to prevent clobber). See above comments on stderr
+  #       # redirect operator '^'
+  #       end: (?=[\s);&|]|(?:[0-9]+(?:<|>>|>)|>>|\^\^|[<>^])[&|]) # todo: watch out for redirect into pipe?
+  #       # End at anything that would end a parameter, including redirections *if*
+  #       # they are *not* this same type of redirection (ie, redirection into file
+  #       # descriptor, or into pipe), in which case this scope stays open and we
+  #       # match the next one
+  #       patterns:
+  #         - begin: (?:([0-9]+)(<|>>|>)|(>>|\^\^|[<>^]))(\?)?\s*
+  #           beginCaptures:
+  #             "0": { name: meta.function-call.operator.redirection.fish }
+  #             "1": { name: meta.string.unquoted.fish constant.numeric.file-descriptor.fish }
+  #             "2": { name: keyword.operator.redirect.fish }
+  #             "3": { name: keyword.operator.redirect.fish }
+  #             "4": { name: keyword.operator.redirect.clobber-test.fish }
+  #           end: ((?:[#&?]|[0-9]*[<>^])\S*)|(?![&?<>^])
+  #           endCaptures:
+  #             "0": { name: meta.function-call.operator.redirection.fish }
+  #             "1": { name: invalid.illegal.path.fish }
+  #           # We have to try and catch bad operators here because if they are seen
+  #           # by the outer end match then they will be considered valid and the
+  #           # redirection scope will immediately terminate
+  #           patterns:
+  #             - include: "#line-continuation" # Eats whitespace on next line
+
+  #         - include: "#line-continuation"
+
+  #         # A redirection path cannot contain brace expansion
+  #         - name: meta.function-call.operator.redirection.fish invalid.illegal.path.fish
+  #           begin: \{|(?=\})
+  #           end: '[^\n\S]|[\n\);&\|]|\}'
+
+  #         # A redirection path cannot contain wildcard expansion
+  #         - name: meta.function-call.operator.redirection.fish invalid.illegal.path.fish
+  #           match: '[*?]\S*'
+
+  #         # Check for characters which are associated with redirection, so path
+  #         # cannot begin with them
+  #         - name: meta.function-call.operator.redirection.fish invalid.illegal.path.fish
+  #           match: '[&?]|[0-9]*[<>^]\S*'
+
+  #         # We reserve the meta.redirection.path scope only for redirection paths
+  #         # which may represent literal paths
+  #         - name:
+  #             meta.function-call.operator.redirection.path.fish
+  #             meta.string.unquoted.fish
+  #             keyword.operator.tilde.fish
+  #           match: \~
+
+  #         # Use strings to build a file path, but break out if any invalid
+  #         # elements or elements that wouldn't form a literal path are encountered
+  #         - name: meta.function-call.operator.redirection.path.fish
+  #           begin: (?![[^\n\S]\n\);&\|<>(${}*?])
+  #           end: (?=[[^\n\S]\n\);&\|<>(${}*?])
+  #           patterns:
+  #             - include: "#string-quoted"
+
+  #             # Should use the same patterns as the above begin/end, but also add
+  #             # the quotes so the #string-quoted rule can handle quoted strings
+  #             - name: meta.string.unquoted.fish
+  #               begin: (?![[^\n\S]\n\);&\|<>(${}*?]|['"])
+  #               end: (?=[[^\n\S]\n\);&\|<>(${}*?]|['"])
+  #               patterns:
+  #                 - include: "#string-unquoted-patterns-escapes"
+
+  #         # A raw path cannot begin with '(' since this undergoes command substitution
+  #         - name: meta.function-call.operator.redirection.fish
+  #           begin: (?=\()
+  #           end: (?!\()
+  #           patterns:
+  #             - include: "#command-substitution"
+
+  #         # A raw path cannot begin with '$' since this undergoes variable expansion
+  #         # We also make sure that variable expansion is scoped as an unquoted string, since if it appears inside quotes then it gets scoped as a quoted string and we should mirror that
+  #         - name: meta.function-call.operator.redirection.fish meta.string.unquoted
+  #           begin: (?=\$)
+  #           end: (?!\$)
+  #           patterns:
+  #             - include: "#variable-expansion"
+
+  # redirection-to-pipe:
+  #   patterns:
+  #     # Mysteriously, the explicit "0<" form isn't allowed (since at least 2.7)
+  #     # Raises the question of what this is actually doing...
+  #     - name: meta.function-call.operator.pipe.stdin.implicit.fish
+  #       begin: (?=<)
+  #       end: '(<)|(\|)' # redirection-common-op-read / pipe-common
+  #       endCaptures:
+  #         "1": { name: keyword.operator.redirect.read.fish }
+  #         "2": { name: keyword.operator.pipe.fish }
+
+  #     # Append form (">>") is illegal from 3.1 onwards
+  #     - name: meta.function-call.operator.pipe.stdout.explicit.fish
+  #       begin: (?=1>>?|>>?)
+  #       end: '(>>)(\|)?|(>)(\|)?|([0-9]+)|(?=>>?)' # redirection-common-op-write / redirection-common-lhs / pipe-common
+  #       endCaptures:
+  #         "1": {name: keyword.operator.redirect.write.append.fish}
+  #         "2": {name: meta.function-call.operator.pipe.stdout.implicit.fish keyword.operator.pipe.fish}
+  #         "3": {name: keyword.operator.redirect.write.truncate.fish}
+  #         "4": {name: meta.function-call.operator.pipe.stdout.implicit.fish keyword.operator.pipe.fish}
+  #         "5": {name: meta.string.unquoted.fish constant.numeric.file-descriptor.fish}
+
+  #     # Pipe with no redirection in front at all
+  #     - name: meta.function-call.operator.pipe.stdout.implicit.fish
+  #       match: (?=\|)
+
+  #     # Only the explicit truncate form ("2>") is legal from 3.1 onwards
+  #     - name: meta.function-call.operator.pipe.stderr.explicit.fish
+  #       begin: (?=2>>?)
+  #       end: (>>)|(>)|([0-9]+)|(?=>>?)|(\|) # redirection-common-op-write / redirection-common-lhs / pipe-common
+  #       endCaptures:
+  #         "1": {name: keyword.operator.redirect.write.append.fish}
+  #         "2": {name: keyword.operator.redirect.write.truncate.fish}
+  #         "3": {name: meta.string.unquoted.fish constant.numeric.file-descriptor.fish}
+  #         "4": {name: meta.function-call.operator.pipe.stdout.implicit.fish}
+  #         "5": {name: keyword.operator.pipe.fish}
+
+  #     - name: meta.function-call.operator.pipe.stderr.implicit.fish
+  #       begin: (?=\^\^?)
+  #       end: (\^\^)|(\^)|(\|) # redirection-common-op-write-caret / pipe-common
+  #       endCaptures:
+  #         "1": {name: keyword.operator.redirect.write.append.fish}
+  #         "2": {name: keyword.operator.redirect.write.truncate.fish}
+  #         "3": {name: keyword.operator.pipe.fish}
+
+  #     # From 3.1 we gain access to the std-write form (see notes in redirection-to-file-path-lhs+op)
+  #     - name: meta.function-call.operator.pipe.std-write.fish
+  #       begin: (?=\&)
+  #       end: '(\&)|(\|)' #  / pipe-common
+  #       endCaptures:
+  #         "1": { name: meta.string.unquoted.fish constant.numeric.file-descriptor.fish }
+  #         "2": {name: keyword.operator.pipe.fish}
+
+  #     # Read ("<") and append form (">>") are illegal from 3.1 onwards
+  #     - name: meta.function-call.operator.pipe.other.fish
+  #       begin: (?=[0-9]+(?:<|>>|>))
+  #       end: '(<)|(>>)|(>)|([0-9]+)|(\|)' # redirection-common-op-read / redirection-common-op-write + redirection-common-lhs / pipe-common
+  #       endCaptures:
+  #         "1": { name: keyword.operator.redirect.read.fish }
+  #         "2": { name: keyword.operator.redirect.write.append.fish }
+  #         "3": { name: keyword.operator.redirect.write.truncate.fish }
+  #         "4": { name: meta.string.unquoted.fish constant.numeric.file-descriptor.fish }
+  #         "5": {name: keyword.operator.pipe.fish}
 
   separator-whitespace:
     # Fundamental structure used to separate elements of a command call; it's

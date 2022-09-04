@@ -27,7 +27,7 @@
     },
     {
       "begin": "(?=\\S)",
-      "end": "(\\n)|(;)|(&)|(?=\\)|#|end)",
+      "end": "(\\n)|(;)|((?<!&)&(?!&))|(?=\\)|#|end)",
       "endCaptures": {
         "1": {
           "name": "meta.function-call.operator.control.newline.fish"
@@ -132,7 +132,7 @@
           "patterns": [
             {
               "name": "invalid.illegal.operator.fish",
-              "match": "[&\\|]|(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&>>?"
+              "match": "(?:(?<!&)&(?!&)|(?<!\\|)\\|(?!\\|)|(?:[0-9]+)?(?:<|>>?)|\\^\\^?)"
             }
           ]
         },
@@ -158,7 +158,7 @@
             },
             {
               "begin": "(?=&&|\\|\\||(?:(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&)?\\|)",
-              "end": "(?=[\\n\\)#]|;|&(?![|>]))(?!&&)",
+              "end": "(?=[\\n\\)#]|;|&(?![|>]))",
               "patterns": [
                 {
                   "name": "invalid.illegal.operator.fish",
@@ -169,10 +169,24 @@
                   "match": "(?:(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&)?\\|(?=\\s*[\\);&])"
                 },
                 {
-                  "include": "#redirection-to-pipe"
-                },
-                {
-                  "begin": "(?=&&|\\|\\||(?:(?:[0-9]+)?(?:[<>]|>>)|\\^\\^?|&)?\\|)",
+                  "begin": "(?x)\n(?:\n  ([0-9]+)?([<>]|>>?)\n  |\n  (\\^\\^?)\n)?\n(\\|)",
+                  "captures": {
+                    "0": {
+                      "name": "meta.function-call.operator.pipe.fish"
+                    },
+                    "1": {
+                      "name": "constant.numeric.file-descriptor.fish"
+                    },
+                    "2": {
+                      "name": "keyword.operator.pipe.redirect.fish"
+                    },
+                    "3": {
+                      "name": "keyword.operator.pipe.redirect.fish"
+                    },
+                    "4": {
+                      "name": "keyword.operator.pipe.fish"
+                    }
+                  },
                   "end": "(?=[\\n\\)#]|;|&(?![|>]))|(?:(&&)|(\\|\\|))|(?=.)",
                   "endCaptures": {
                     "1": {
@@ -1046,11 +1060,11 @@
             },
             {
               "name": "meta.function-call.operator.redirection.file-descriptor.fish meta.string.unquoted.fish constant.numeric.file-descriptor.fish",
-              "match": "(?:[0-9]+)(?=$|[[^\\n\\S]\\n\\);&\\|<>])"
+              "match": "(?:[0-9]+)(?=$|[\\s);&|<>])"
             },
             {
               "name": "meta.function-call.operator.redirection.file-descriptor.fish meta.string.unquoted.fish keyword.operator.redirect.close.fish",
-              "match": "(?:-)(?=$|[[^\\n\\S]\\n\\);&\\|<>])"
+              "match": "(?:-)(?=$|[\\s);&|<>])"
             },
             {
               "name": "meta.function-call.operator.redirection.fish invalid.illegal.file-descriptor.fish",
@@ -1118,16 +1132,16 @@
             },
             {
               "name": "meta.function-call.operator.redirection.path.fish",
-              "begin": "(?![[^\\n\\S]\\n\\);&\\|<>(${}*?])",
-              "end": "(?=[[^\\n\\S]\\n\\);&\\|<>(${}*?])",
+              "begin": "(?![\\s);&(|<>${}*?])",
+              "end": "(?=[\\s);&(|<>${}*?])",
               "patterns": [
                 {
                   "include": "#string-quoted"
                 },
                 {
                   "name": "meta.string.unquoted.fish",
-                  "begin": "(?![[^\\n\\S]\\n\\);&\\|<>(${}*?]|['\"])",
-                  "end": "(?=[[^\\n\\S]\\n\\);&\\|<>(${}*?]|['\"])",
+                  "begin": "(?![\\s);&(|<>${}*?]|['\"])",
+                  "end": "(?=[\\s);&(|<>${}*?]|['\"])",
                   "patterns": [
                     {
                       "include": "#string-unquoted-patterns-escapes"
@@ -1157,122 +1171,6 @@
               ]
             }
           ]
-        }
-      ]
-    },
-    "redirection-to-pipe": {
-      "patterns": [
-        {
-          "name": "meta.function-call.operator.pipe.stdin.implicit.fish",
-          "begin": "(?=<)",
-          "end": "(<)|(\\|)",
-          "endCaptures": {
-            "1": {
-              "name": "keyword.operator.redirect.read.fish"
-            },
-            "2": {
-              "name": "keyword.operator.pipe.fish"
-            }
-          }
-        },
-        {
-          "name": "meta.function-call.operator.pipe.stdout.explicit.fish",
-          "begin": "(?=1>>?|>>?)",
-          "end": "(>>)(\\|)?|(>)(\\|)?|([0-9]+)|(?=>>?)",
-          "endCaptures": {
-            "1": {
-              "name": "keyword.operator.redirect.write.append.fish"
-            },
-            "2": {
-              "name": "meta.function-call.operator.pipe.stdout.implicit.fish keyword.operator.pipe.fish"
-            },
-            "3": {
-              "name": "keyword.operator.redirect.write.truncate.fish"
-            },
-            "4": {
-              "name": "meta.function-call.operator.pipe.stdout.implicit.fish keyword.operator.pipe.fish"
-            },
-            "5": {
-              "name": "meta.string.unquoted.fish constant.numeric.file-descriptor.fish"
-            }
-          }
-        },
-        {
-          "name": "meta.function-call.operator.pipe.stdout.implicit.fish",
-          "match": "(?=\\|)"
-        },
-        {
-          "name": "meta.function-call.operator.pipe.stderr.explicit.fish",
-          "begin": "(?=2>>?)",
-          "end": "(>>)|(>)|([0-9]+)|(?=>>?)|(\\|)",
-          "endCaptures": {
-            "1": {
-              "name": "keyword.operator.redirect.write.append.fish"
-            },
-            "2": {
-              "name": "keyword.operator.redirect.write.truncate.fish"
-            },
-            "3": {
-              "name": "meta.string.unquoted.fish constant.numeric.file-descriptor.fish"
-            },
-            "4": {
-              "name": "meta.function-call.operator.pipe.stdout.implicit.fish"
-            },
-            "5": {
-              "name": "keyword.operator.pipe.fish"
-            }
-          }
-        },
-        {
-          "name": "meta.function-call.operator.pipe.stderr.implicit.fish",
-          "begin": "(?=\\^\\^?)",
-          "end": "(\\^\\^)|(\\^)|(\\|)",
-          "endCaptures": {
-            "1": {
-              "name": "keyword.operator.redirect.write.append.fish"
-            },
-            "2": {
-              "name": "keyword.operator.redirect.write.truncate.fish"
-            },
-            "3": {
-              "name": "keyword.operator.pipe.fish"
-            }
-          }
-        },
-        {
-          "name": "meta.function-call.operator.pipe.std-write.fish",
-          "begin": "(?=\\&)",
-          "end": "(\\&)|(\\|)",
-          "endCaptures": {
-            "1": {
-              "name": "meta.string.unquoted.fish constant.numeric.file-descriptor.fish"
-            },
-            "2": {
-              "name": "keyword.operator.pipe.fish"
-            }
-          }
-        },
-        {
-          "name": "meta.function-call.operator.pipe.other.fish",
-          "begin": "(?=[0-9]+(?:<|>>|>))",
-          "end": "(<)|(>>)|(>)|([0-9]+)|(\\|)",
-          "endCaptures": {
-            "1": {
-              "name": "keyword.operator.redirect.read.fish"
-            },
-            "2": {
-              "name": "keyword.operator.redirect.write.append.fish"
-            },
-            "3": {
-              "name": "keyword.operator.redirect.write.truncate.fish"
-            },
-            "4": {
-              "name": "meta.string.unquoted.fish constant.numeric.file-descriptor.fish"
-            },
-            "5": {
-              "name": "keyword.operator.pipe.fish"
-            }
-          }
         }
       ]
     },
