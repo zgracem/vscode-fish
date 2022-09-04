@@ -130,10 +130,13 @@ repository:
       # This is done in a weird way so that we can mark '&' as invalid instead
       # of letting it naturally close the pipeline scope and be marked as valid
       - begin: (?=[&\|]|(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&>>?)
+        # End at newline, ensure no operators or redirection after next
+        # whitespace
         end: (?=\n)|(?!\s*(?:[\n\)#]|;|&(?![|>])|(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\||(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&>>?))
         patterns:
           - name: invalid.illegal.operator.fish
-            match: '[&\|]|(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&>>?'
+            match: '[&\|]|(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&>>?' # [&\|]|(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&>>?
+            # match: (?:[&|]|(?:[0-9]+)?(?:<|>>?)|\^\^?)
 
       # Match commands illegal in the main context
       - name: invalid.illegal.function-call.fish
@@ -172,9 +175,14 @@ repository:
               - name: invalid.illegal.operator.fish
                 match: '(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\|(?=\s*[\);&])'
 
+              - include: "#redirection-to-pipe"
+
               # Look ahead for flow control and piping again
               - begin: (?=&&|\|\||(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\|)
-                end: (?=[\n\)#]|;|&(?![|>]))
+                end: (?=[\n\)#]|;|&(?![|>]))|(?:(&&)|(\|\|))|(?=.)
+                endCaptures:
+                  "1": { name: meta.function-call.operator.control.double-ampersand.fish keyword.operator.control.fish }
+                  "2": { name: meta.function-call.operator.control.double-bar.fish keyword.operator.control.fish }
                 patterns:
                   # After piping/logic can't be an "and" or "or" that is taking
                   # another command as its parameters. This regex should
@@ -185,6 +193,14 @@ repository:
                   # invalid since the word will be instead
                   - name: invalid.illegal.function-call.fish
                     match: (and|or)\b(?!\s*[\n;-])
+
+                  # Elements that we can consume indefinitely between the piping and
+                  # the next pipeline-segment (command call) which follows it
+                  - include: "#separator-whitespace"
+                  - include: "#line-continuation"
+                  - include: "#comment"
+                  - name: meta.function-call.operator.control.newline.ignored.fish
+                    match: \n
 
                   # Match the next command and any piping/logic which follows it, and so on
                   - include: "#pipeline-segment"
@@ -219,7 +235,7 @@ repository:
       # that the command is caught elsewhere as a standard command.
       - begin: (?:builtin|command|exec)\b(?!\s*(?:[\n\)#]|;|&(?![|>])|(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\||(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&>>?|-))
         beginCaptures:
-          "1": { name: meta.function-call.name.fish support.function.fish meta.string.unquoted.fish }
+          "0": { name: meta.function-call.name.fish support.function.fish meta.string.unquoted.fish }
         end: (?=[\n\)#]|;|&(?![|>])|(?:(?:[0-9]+)?(?:[<>]|>>)|\^\^?|&)?\|)
         patterns:
           - include: "#separator-whitespace"
@@ -908,6 +924,70 @@ repository:
             end: (?!\$)
             patterns:
               - include: "#variable-expansion"
+
+  redirection-to-pipe:
+    patterns:
+      # Mysteriously, the explicit "0<" form isn't allowed (since at least 2.7)
+      # Raises the question of what this is actually doing...
+      - name: meta.function-call.operator.pipe.stdin.implicit.fish
+        begin: (?=<)
+        end: '(<)|(\|)' # redirection-common-op-read / pipe-common
+        endCaptures:
+          "1": { name: keyword.operator.redirect.read.fish }
+          "2": { name: keyword.operator.pipe.fish }
+
+      # Append form (">>") is illegal from 3.1 onwards
+      - name: meta.function-call.operator.pipe.stdout.explicit.fish
+        begin: (?=1>>?|>>?)
+        end: '(>>)(\|)?|(>)(\|)?|([0-9]+)|(?=>>?)' # redirection-common-op-write / redirection-common-lhs / pipe-common
+        endCaptures:
+          "1": {name: keyword.operator.redirect.write.append.fish}
+          "2": {name: meta.function-call.operator.pipe.stdout.implicit.fish keyword.operator.pipe.fish}
+          "3": {name: keyword.operator.redirect.write.truncate.fish}
+          "4": {name: meta.function-call.operator.pipe.stdout.implicit.fish keyword.operator.pipe.fish}
+          "5": {name: meta.string.unquoted.fish constant.numeric.file-descriptor.fish}
+
+      # Pipe with no redirection in front at all
+      - name: meta.function-call.operator.pipe.stdout.implicit.fish
+        match: (?=\|)
+
+      # Only the explicit truncate form ("2>") is legal from 3.1 onwards
+      - name: meta.function-call.operator.pipe.stderr.explicit.fish
+        begin: (?=2>>?)
+        end: (>>)|(>)|([0-9]+)|(?=>>?)|(\|) # redirection-common-op-write / redirection-common-lhs / pipe-common
+        endCaptures:
+          "1": {name: keyword.operator.redirect.write.append.fish}
+          "2": {name: keyword.operator.redirect.write.truncate.fish}
+          "3": {name: meta.string.unquoted.fish constant.numeric.file-descriptor.fish}
+          "4": {name: meta.function-call.operator.pipe.stdout.implicit.fish}
+          "5": {name: keyword.operator.pipe.fish}
+
+      - name: meta.function-call.operator.pipe.stderr.implicit.fish
+        begin: (?=\^\^?)
+        end: (\^\^)|(\^)|(\|) # redirection-common-op-write-caret / pipe-common
+        endCaptures:
+          "1": {name: keyword.operator.redirect.write.append.fish}
+          "2": {name: keyword.operator.redirect.write.truncate.fish}
+          "3": {name: keyword.operator.pipe.fish}
+
+      # From 3.1 we gain access to the std-write form (see notes in redirection-to-file-path-lhs+op)
+      - name: meta.function-call.operator.pipe.std-write.fish
+        begin: (?=\&)
+        end: '(\&)|(\|)' #  / pipe-common
+        endCaptures:
+          "1": { name: meta.string.unquoted.fish constant.numeric.file-descriptor.fish }
+          "2": {name: keyword.operator.pipe.fish}
+
+      # Read ("<") and append form (">>") are illegal from 3.1 onwards
+      - name: meta.function-call.operator.pipe.other.fish
+        begin: (?=[0-9]+(?:<|>>|>))
+        end: '(<)|(>>)|(>)|([0-9]+)|(\|)' # redirection-common-op-read / redirection-common-op-write + redirection-common-lhs / pipe-common
+        endCaptures:
+          "1": { name: keyword.operator.redirect.read.fish }
+          "2": { name: keyword.operator.redirect.write.append.fish }
+          "3": { name: keyword.operator.redirect.write.truncate.fish }
+          "4": { name: meta.string.unquoted.fish constant.numeric.file-descriptor.fish }
+          "5": {name: keyword.operator.pipe.fish}
 
   separator-whitespace:
     # Fundamental structure used to separate elements of a command call; it's
