@@ -335,7 +335,7 @@
           "end": "(?x)\n(?=\n  (?:\n    [\\n)#;&]\n  |\n    (?:(?:[0-9]+)?(?:<|>>?)|\\^\\^?)?\\|\n  )\n)",
           "patterns": [
             {
-              "begin": "(?![\\s<>^\\0])",
+              "begin": "(?![\\s<>^%])",
               "end": "(?=[[^\\n\\S]\\n\\);&\\|<>])",
               "patterns": [
                 {
@@ -415,7 +415,7 @@
             },
             {
               "name": "invalid.illegal.function-call.fish",
-              "match": "\\\\0[^[^\\n\\S]\\n\\);&\\|<>]*(?=[[^\\n\\S]\\n\\);&\\|<>])"
+              "match": "\\%[^[^\\n\\S]\\n\\);&\\|<>]*(?=[[^\\n\\S]\\n\\);&\\|<>])"
             },
             {
               "include": "#redirection"
@@ -1297,7 +1297,7 @@
           "end": "(?=[[^\\n\\S]\\n\\);&\\|<>])",
           "patterns": [
             {
-              "match": "(\\\\0)[0-9]+(?=$|[[^\\n\\S]\\n\\);&\\|<>])",
+              "match": "(\\%)[0-9]+(?=$|[[^\\n\\S]\\n\\);&\\|<>])",
               "captures": {
                 "0": {
                   "name": "meta.function-call.parameter.argument.job-expansion.fish meta.string.unquoted.fish"
@@ -1308,7 +1308,7 @@
               }
             },
             {
-              "match": "(\\\\0)(self)(?=$|[[^\\n\\S]\\n\\);&\\|<>])",
+              "match": "(\\%)(self)(?=$|[[^\\n\\S]\\n\\);&\\|<>])",
               "captures": {
                 "0": {
                   "name": "meta.function-call.parameter.argument.process-expansion.self.fish meta.string.unquoted.fish"
@@ -1322,7 +1322,7 @@
               }
             },
             {
-              "match": "(\\\\0)(last)(?=$|[[^\\n\\S]\\n\\);&\\|<>])",
+              "match": "(\\%)(last)(?=$|[[^\\n\\S]\\n\\);&\\|<>])",
               "captures": {
                 "0": {
                   "name": "meta.function-call.parameter.argument.process-expansion.last.fish meta.string.unquoted.fish"
@@ -1337,7 +1337,7 @@
             },
             {
               "name": "meta.function-call.parameter.argument.process-expansion.other.fish",
-              "begin": "\\\\0",
+              "begin": "\\%",
               "beginCaptures": {
                 "0": {
                   "name": "meta.string.unquoted.fish punctuation.definition.process.fish"
@@ -1795,7 +1795,7 @@
       "patterns": [
         {
           "name": "constant.character.escape.fish",
-          "match": "(?x)\n\\\\[abefnrtv $\\\\*?#(){}\\[\\]<>^&|;\"']\n|\n\\\\[~\\0]\n|\n\\\\[xX][0-9A-Fa-f]{1,2}\n|\n\\\\[0-7]{1,3}\n|\n\\\\u[0-9A-Fa-f]{1,4}\n|\n\\\\U[0-9A-Fa-f]{1,8}\n|\n\\\\c[?-~]"
+          "match": "(?x)\n\\\\[abefnrtv $\\\\*?#(){}\\[\\]<>^&|;\"']\n|\n\\\\[~%]\n|\n\\\\[xX][0-9A-Fa-f]{1,2}\n|\n\\\\[0-7]{1,3}\n|\n\\\\u[0-9A-Fa-f]{1,4}\n|\n\\\\U[0-9A-Fa-f]{1,8}\n|\n\\\\c[?-~]"
         },
         {
           "name": "constant.character.escape.newline.fish",

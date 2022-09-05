@@ -22,4 +22,4 @@ interpolated_variables = variables.transform_values do |val|
   format(format(format(val, variables), variables), variables)
 end
 
-puts format(braces_to_printf(template), interpolated_variables)
+puts format(braces_to_printf(template), interpolated_variables).gsub(/\\0/, "%")
