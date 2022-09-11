@@ -45,8 +45,8 @@ function format_json
     jq '.'
 end
 
-interpolate_variables syntaxes/fish.tmLanguage.yaml.in \
-    >syntaxes/fish.tmLanguage.yaml
+# interpolate_variables syntaxes/fish.tmLanguage.yaml.in \
+#     >syntaxes/fish.tmLanguage.yaml
 
 remove_regex_comments syntaxes/fish.tmLanguage.yaml | yaml2json \
     | format_json \
