@@ -1,17 +1,18 @@
 ---
 $schema: https://raw.githubusercontent.com/Septh/tmlanguage/master/tmLanguage.schema.json#
 
-# Adapted (incl. comments) from Phidica Veia's syntax def. for Sublime Text:
-# <https://github.com/Phidica/sublime-fish/blob/f838ab4/fish.sublime-syntax>
+# Adapted (incl. comments) from Phidica Veia's syntax defs. for Sublime Text:
+#   <https://github.com/Phidica/sublime-fish/blob/st2/fish.YAML-tmLanguage>
+#   <https://github.com/Phidica/sublime-fish/blob/f838ab4/fish.sublime-syntax>
 name: Friendly Interactive Shell (fish)
 scopeName: source.shell.fish
 fileTypes: [fish]
 uuid: 73fe8880-b0d7-4073-8543-e923d65dad79
 
-firstLineMatch: "^#!.*\\b(fish)\\b"
+firstLineMatch: ^#!.*\b(fish)\b
 
-foldingStartMarker: "(;|^)\\s*(begin|for|function|if|switch|while)\\b.*$"
-foldingStopMarker: "(;|^)\\s*end\\b.*$"
+foldingStartMarker: (;|^)\s*(begin|for|function|if|switch|while)\b.*$
+foldingStopMarker: (;|^)\s*end\b.*$
 
 patterns:
   # Pick up '#' and "\\\n" before command-call sees them
@@ -40,9 +41,9 @@ patterns:
   - begin: (?=\S)
     end: (\n)|(;)|(&)|(?=\)|#|end)
     endCaptures:
-      "1": { name: meta.function-call.operator.control.newline.fish }
-      "2": { name: meta.function-call.operator.control.semicolon.fish keyword.operator.control.fish }
-      "3": { name: meta.function-call.operator.control.ampersand.fish keyword.operator.control.fish }
+      1: { name: meta.function-call.operator.control.newline.fish }
+      2: { name: meta.function-call.operator.control.semicolon.fish keyword.operator.control.fish }
+      3: { name: meta.function-call.operator.control.ampersand.fish keyword.operator.control.fish }
     patterns:
       - include: "#pipeline"
 
@@ -53,7 +54,7 @@ repository:
       - name: comment.line.fish
         begin: \#
         beginCaptures:
-          "0": { name: punctuation.definition.comment.fish }
+          0: { name: punctuation.definition.comment.fish }
         end: \n
 
   line-continuation:
@@ -94,7 +95,7 @@ repository:
         patterns:
           - begin: (and|or)\b(?!\s*[\n\);-])
             beginCaptures:
-              "1": { name: meta.function-call.name.fish keyword.operator.word.fish meta.string.unquoted.fish }
+              1: { name: meta.function-call.name.fish keyword.operator.word.fish meta.string.unquoted.fish }
             end: (?![^\n\S]|\&|\\\n)
             patterns:
               - include: "#separator-whitespace"
@@ -194,11 +195,11 @@ repository:
               # as redirection)
               - begin: (?:([0-9]+)?(<|>>?)|(\^\^?))?(\|)
                 captures:
-                  "0": { name: meta.function-call.operator.pipe.fish }
-                  "1": { name: constant.numeric.file-descriptor.fish }
-                  "2": { name: keyword.operator.pipe.redirect.fish }
-                  "3": { name: keyword.operator.pipe.redirect.fish }
-                  "4": { name: keyword.operator.pipe.fish }
+                  0: { name: meta.function-call.operator.pipe.fish }
+                  1: { name: constant.numeric.file-descriptor.fish }
+                  2: { name: keyword.operator.pipe.redirect.fish }
+                  3: { name: keyword.operator.pipe.redirect.fish }
+                  4: { name: keyword.operator.pipe.fish }
                 end: (?=[\n)#;&])
                 patterns:
                   - # After a pipe can't be an "and" or "or" that is taking
@@ -246,7 +247,7 @@ repository:
             )
           )
         beginCaptures:
-          "1": { name: meta.function-call.name.fish support.function.fish meta.string.unquoted.fish }
+          1: { name: meta.function-call.name.fish support.function.fish meta.string.unquoted.fish }
         end: |-
           (?x)
           (?# Look ahead for control operations after whitespace)
@@ -278,7 +279,7 @@ repository:
           # If the command is followed by an "&", then that's invalid
           - begin: (not)\b(?!\s*[\n);-])
             beginCaptures:
-              "1": { name: meta.function-call.name.fish keyword.operator.word.fish meta.string.unquoted.fish }
+              1: { name: meta.function-call.name.fish keyword.operator.word.fish meta.string.unquoted.fish }
             end: (?![^\n\S]|\&|\\\n)
             patterns:
               - include: "#separator-whitespace"
@@ -326,11 +327,11 @@ repository:
               # of `[` `]`
               - begin: \[(?=[\s<>]|\\\n)
                 beginCaptures:
-                  "0": { name: meta.function-call.name.fish support.function.test.begin.fish }
+                  0: { name: meta.function-call.name.fish support.function.test.begin.fish }
                 end: (\])|(\n|[;&)|].*)
                 endCaptures:
-                  "1": { name: meta.function-call.name.fish support.function.test.end.fish }
-                  "2": { name: invalid.illegal.function-call.fish }
+                  1: { name: meta.function-call.name.fish support.function.test.end.fish }
+                  2: { name: invalid.illegal.function-call.fish }
                 patterns:
                   - include: "#separator-whitespace"
                   - include: "#line-continuation"
@@ -344,7 +345,7 @@ repository:
               # parsing)
               - match: (?:break|continue|return)(?=[\s);&|<>])
                 captures:
-                  "0": { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
+                  0: { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
 
               # Anonymous scope - A generic name element
               - begin: (?!\s)
@@ -471,14 +472,14 @@ repository:
       # Block commands cannot be backgrounded, piped, or redirected
       - match: (begin|while|if|for|switch|function)\s*([&|<>])
         captures:
-          "1": { name: meta.function-call.name.fish variable.function.fish meta.string.unquoted.fish }
-          "2": { name: invalid.illegal.operator.fish }
+          1: { name: meta.function-call.name.fish variable.function.fish meta.string.unquoted.fish }
+          2: { name: invalid.illegal.operator.fish }
 
       # The begin command uniquely cannot be the last command in a command substitution
       - match: (begin)\s*(\))
         captures:
-          "1": { name: meta.function-call.name.fish variable.function.fish meta.string.unquoted.fish }
-          "2": { name: invalid.illegal.operator.fish }
+          1: { name: meta.function-call.name.fish variable.function.fish meta.string.unquoted.fish }
+          2: { name: invalid.illegal.operator.fish }
 
       # The begin command can be alone on a line or followed by any command that
       # doesn't start with a '-'. If a '-' is seen it shouldn't be treated as a
@@ -486,10 +487,10 @@ repository:
       - name: meta.block.begin.fish
         begin: begin(?=\s*$|\s*[\n;]|\s+[^\s-])
         beginCaptures:
-          "0": { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
+          0: { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
         end: end(?=$|[\s);&|<>])
         endCaptures:
-          "0": { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
+          0: { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
         patterns:
           - include: $self
 
@@ -499,13 +500,13 @@ repository:
         # closes the scope or a string starting with a '-') then open the scope
         end: end(?=$|[\s);&|<>])
         endCaptures:
-          "0": { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
+          0: { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
         patterns:
           # Anonymous scope - Capture the command name we know is there, include
           # a single instance of a pipeline, and end when an operator is seen
           - begin: while
             beginCaptures:
-              "0": { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
+              0: { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
             end: (?=[\n);&])
             patterns:
               - include: "#line-continuation"
@@ -516,8 +517,8 @@ repository:
           # handles any invalid operators
           - begin: (\n)|(;)|(?=[)&])
             beginCaptures:
-              "1": { name: meta.function-call.operator.control.newline.fish }
-              "2": { name: meta.function-call.operator.control.semicolon.fish keyword.operator.control.fish }
+              1: { name: meta.function-call.operator.control.newline.fish }
+              2: { name: meta.function-call.operator.control.semicolon.fish keyword.operator.control.fish }
             end: (?=end(?:$|[\s);&|<>]))
             patterns:
               - include: $self
@@ -528,7 +529,7 @@ repository:
         # closes the scope or a string starting with a '-') then open the scope
         end: end(?=$|[\s);&|<>])
         endCaptures:
-          "0": { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
+          0: { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
         patterns:
           # Note that this internal scope does not treat the closing parenthesis
           # as a control operator, because a command substitution can't end in
@@ -541,18 +542,18 @@ repository:
         # closes the scope or a string starting with a '-') then open the scope
         end: end(?=$|[\s);&|<>])
         endCaptures:
-          "0": { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
+          0: { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
         patterns:
           # Anonymous scope - Capture the command name we know is there, include
           # a single instance of a parameter (the varname), and end when the
           # whitespace after the varname is captured
           - begin: (for)(\s+)
             beginCaptures:
-              "1": { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
-              "2": { name: meta.function-call.fish }
+              1: { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
+              2: { name: meta.function-call.fish }
             end: \s+
             endCaptures:
-              "0": { name: meta.function-call.fish }
+              0: { name: meta.function-call.fish }
             patterns:
               - include: "#line-continuation" # Eats whitespace on next line!
 
@@ -571,7 +572,7 @@ repository:
           # operator is seen
           - begin: in(?=\s)
             beginCaptures:
-              "0": { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
+              0: { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
             end: (?=[\n)#;&])
             patterns:
               - include: "#separator-whitespace"
@@ -583,8 +584,8 @@ repository:
           # handles any invalid operators
           - begin: (\n)|(;)|(?=[)#&])
             beginCaptures:
-              "1": { name: meta.function-call.operator.control.newline.fish }
-              "2": { name: meta.function-call.operator.control.semicolon.fish keyword.operator.control.fish }
+              1: { name: meta.function-call.operator.control.newline.fish }
+              2: { name: meta.function-call.operator.control.semicolon.fish keyword.operator.control.fish }
             end: (?=end(?:$|[\s);&|<>]))
             patterns:
               - include: $self
@@ -602,7 +603,7 @@ repository:
         # closes the scope or a string starting with a '-') then open the scope
         end: end(?=$|[\s);&|<>])
         endCaptures:
-          "0": { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
+          0: { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
         patterns:
           # Anonymous scope - Match the valid part of the switch statement, then
           # look for an invalid part
@@ -614,8 +615,8 @@ repository:
               # when whitespace or a control operator is seen
               - begin: (switch)(\s+)
                 beginCaptures:
-                  "1": { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
-                  "2": { name: meta.function-call.fish }
+                  1: { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
+                  2: { name: meta.function-call.fish }
                 end: (?=[\s);&])
                 patterns:
                   - include: "#line-continuation" # Eats whitespace on next line!
@@ -631,7 +632,7 @@ repository:
               # control operator is seen
               - begin: \s+
                 beginCaptures:
-                  "0": { name: meta.function-call.fish }
+                  0: { name: meta.function-call.fish }
                 end: (?=[\n);&])
                 patterns:
                   - name: invalid.illegal.string.fish
@@ -642,8 +643,8 @@ repository:
           # handles any invalid operators
           - begin: (\n)|(;)|(?=[)&])
             beginCaptures:
-              "1": { name: meta.function-call.operator.control.fish }
-              "2": { name: meta.function-call.operator.control.fish keyword.operator.control.fish }
+              1: { name: meta.function-call.operator.control.fish }
+              2: { name: meta.function-call.operator.control.fish keyword.operator.control.fish }
             end: (?=end(?:$|[\s);&|<>]))
             patterns:
               # Anonymous scope - Capture the command name which might be there,
@@ -652,11 +653,11 @@ repository:
               # any invalid operators used to end the scope
               - begin: case(?=[\s);&])
                 beginCaptures:
-                  "0": { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
+                  0: { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
                 end: (\n)|(;)|(?=[)#&|]|(?:[0-9]+)?(?:<|>>?)|\^\^?)
                 endCaptures:
-                  "1": { name: meta.function-call.operator.control.newline.fish }
-                  "2": { name: meta.function-call.operator.control.semicolon.fish keyword.operator.control.fish }
+                  1: { name: meta.function-call.operator.control.newline.fish }
+                  2: { name: meta.function-call.operator.control.semicolon.fish keyword.operator.control.fish }
                 patterns:
                   - include: "#separator-whitespace"
                   - include: "#line-continuation"
@@ -670,7 +671,7 @@ repository:
         # closes the scope or a string starting with a '-') then open the scope
         end: end(?=$|[\s);&|<>])
         endCaptures:
-          "0": { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
+          0: { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
         patterns:
           # Anonymous scope - Match the defined name of the function statement,
           # then look for further parameters
@@ -693,8 +694,8 @@ repository:
               # when whitespace or a control operator is seen
               - begin: (function)\s+
                 beginCaptures:
-                  "0": { name: meta.function-call.name.fish }
-                  "1": { name: keyword.control.conditional.fish meta.string.unquoted.fish }
+                  0: { name: meta.function-call.name.fish }
+                  1: { name: keyword.control.conditional.fish meta.string.unquoted.fish }
                 end: (?=[\s);&|<>])
                 patterns:
                   - include: "#line-continuation" # Eats whitespace on next line!
@@ -741,8 +742,8 @@ repository:
           # handles any invalid operators
           - begin: (\n)|(;)|(?=[)#&|]|(?:[0-9]+)?(?:<|>>?)|\^\^?)
             beginCaptures:
-              "1": { name: meta.function-call.operator.control.newline.fish }
-              "2": { name: meta.function-call.operator.control.semicolon.fish keyword.operator.control.fish }
+              1: { name: meta.function-call.operator.control.newline.fish }
+              2: { name: meta.function-call.operator.control.semicolon.fish keyword.operator.control.fish }
             end: (?=end(?:$|[\s);&|<>]))
             patterns:
               - include: $self
@@ -764,7 +765,7 @@ repository:
           # seen
           - begin: if
             beginCaptures:
-              "0": { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
+              0: { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
             end: (?=[\n#;&])
             patterns:
               - include: "#line-continuation"
@@ -775,8 +776,8 @@ repository:
           # invalid operators
           - begin: (\n)|(;)|(?=[#&])
             beginCaptures:
-              "1": { name: meta.function-call.operator.control.newline.fish }
-              "2": { name: meta.function-call.operator.control.semicolon.fish keyword.operator.control.fish }
+              1: { name: meta.function-call.operator.control.newline.fish }
+              2: { name: meta.function-call.operator.control.semicolon.fish keyword.operator.control.fish }
             end: (?=end(?:$|[\s);&|<>]))
             patterns:
               # Anonymous scope - Capture an `else` up to the control operator
@@ -789,7 +790,7 @@ repository:
                   # comment, and mark anything besides an `if` as illegal
                   - begin: else(?=\s*[\s;])
                     beginCaptures:
-                      "0": { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
+                      0: { name: meta.function-call.name.fish keyword.control.conditional.fish meta.string.unquoted.fish }
                     end: (?=[\n#;&]|if(?:\s*\n|\s+[^\s;]))
                     patterns:
                       - include: "#separator-whitespace"
@@ -805,8 +806,8 @@ repository:
                   # invalid operators
                   - begin: (\n)|(;)|(?=[#&])
                     beginCaptures:
-                      "1": { name: meta.function-call.operator.control.newline.fish }
-                      "2": { name: meta.function-call.operator.control.semicolon.fish keyword.operator.control.fish }
+                      1: { name: meta.function-call.operator.control.newline.fish }
+                      2: { name: meta.function-call.operator.control.semicolon.fish keyword.operator.control.fish }
                     end: (?=end(?:$|[\s);&|<>]))
                     patterns:
                       - include: $self
@@ -837,15 +838,15 @@ repository:
         patterns:
           - begin: (?:([0-9]+)(<|>>|>)|(>>|\^\^|[<>^]))(\&)\s*
             beginCaptures:
-              "0": { name: meta.function-call.operator.redirection.fish }
-              "1": { name: meta.string.unquoted.fish constant.numeric.file-descriptor.fish }
-              "2": { name: keyword.operator.redirect.fish }
-              "3": { name: keyword.operator.redirect.fish }
-              "4": { name: keyword.operator.redirect.dereference.fish }
+              0: { name: meta.function-call.operator.redirection.fish }
+              1: { name: meta.string.unquoted.fish constant.numeric.file-descriptor.fish }
+              2: { name: keyword.operator.redirect.fish }
+              3: { name: keyword.operator.redirect.fish }
+              4: { name: keyword.operator.redirect.dereference.fish }
             end: ([#&]\S*)|(?![&\\])
             endCaptures:
-              "0": { name: meta.function-call.operator.redirection.fish }
-              "1": { name: invalid.illegal.file-descriptor.fish }
+              0: { name: meta.function-call.operator.redirection.fish }
+              1: { name: invalid.illegal.file-descriptor.fish }
             # We have to try and catch an '&' here because if it is seen by the
             # outer end match then it will be considered a valid operator and the
             # redirection scope will immediately terminate
@@ -898,15 +899,15 @@ repository:
         patterns:
           - begin: (?:([0-9]+)(<|>>|>)|(>>|\^\^|[<>^]))(\?)?\s*
             beginCaptures:
-              "0": { name: meta.function-call.operator.redirection.fish }
-              "1": { name: meta.string.unquoted.fish constant.numeric.file-descriptor.fish }
-              "2": { name: keyword.operator.redirect.fish }
-              "3": { name: keyword.operator.redirect.fish }
-              "4": { name: keyword.operator.redirect.clobber-test.fish }
+              0: { name: meta.function-call.operator.redirection.fish }
+              1: { name: meta.string.unquoted.fish constant.numeric.file-descriptor.fish }
+              2: { name: keyword.operator.redirect.fish }
+              3: { name: keyword.operator.redirect.fish }
+              4: { name: keyword.operator.redirect.clobber-test.fish }
             end: ((?:[#&?]|[0-9]*[<>^])\S*)|(?![&?<>^])
             endCaptures:
-              "0": { name: meta.function-call.operator.redirection.fish }
-              "1": { name: invalid.illegal.path.fish }
+              0: { name: meta.function-call.operator.redirection.fish }
+              1: { name: invalid.illegal.path.fish }
             # We have to try and catch bad operators here because if they are seen
             # by the outer end match then they will be considered valid and the
             # redirection scope will immediately terminate
@@ -991,7 +992,7 @@ repository:
               - name: variable.parameter.fish
                 begin: (?:--)
                 beginCaptures:
-                  "0": { name: punctuation.definition.option.long.begin.fish meta.string.unquoted.fish }
+                  0: { name: punctuation.definition.option.long.begin.fish meta.string.unquoted.fish }
                 end: (?=[\s);&|<>]|=)
                 patterns:
                   # We mimic the parameter-common rule but use a tweaked
@@ -1016,7 +1017,7 @@ repository:
               # as numerics
               - begin: (?:=)
                 beginCaptures:
-                  "0": { name: variable.parameter.fish punctuation.definition.option.long.separator.fish meta.string.unquoted.fish }
+                  0: { name: variable.parameter.fish punctuation.definition.option.long.separator.fish meta.string.unquoted.fish }
                 end: (?=[\s);&|<>])
                 patterns:
                   - name: meta.string.unquoted.fish constant.numeric.fish
@@ -1028,7 +1029,7 @@ repository:
           - name: meta.function-call.parameter.option.short.fish variable.parameter.fish
             begin: (?:-)(?=[^\s);&|<>])
             beginCaptures:
-              "0": { name: punctuation.definition.option.short.fish meta.string.unquoted.fish }
+              0: { name: punctuation.definition.option.short.fish meta.string.unquoted.fish }
             end: (?=[\s);&|<>])
             patterns:
               - include: "#parameter-common"
@@ -1074,7 +1075,7 @@ repository:
           - name: meta.function-call.parameter.argument.process-expansion.fish
             begin: \%
             beginCaptures:
-              "0": { name: meta.string.unquoted.fish punctuation.definition.process.fish }
+              0: { name: meta.string.unquoted.fish punctuation.definition.process.fish }
             end: (?=[\s);&|<>])
             patterns:
               - include: "#parameter-common"
@@ -1118,10 +1119,10 @@ repository:
           - name: meta.parens.command-substitution.fish
             begin: \(
             beginCaptures:
-              "0": { name: punctuation.section.parens.begin.fish }
+              0: { name: punctuation.section.parens.begin.fish }
             end: \)
             endCaptures:
-              "0": { name: punctuation.section.parens.end.fish }
+              0: { name: punctuation.section.parens.end.fish }
             patterns:
               # The inside of a command substitution is indistinguishable from a
               # global scope
@@ -1152,7 +1153,7 @@ repository:
       - name: variable.other.fish
         begin: \$
         beginCaptures:
-          "0": { name: punctuation.definition.variable.fish }
+          0: { name: punctuation.definition.variable.fish }
         end: (?=[^\$\w])(?!\\\n)
         patterns:
           - include: "#string-unquoted-contents-escapes-newline"
@@ -1174,7 +1175,7 @@ repository:
         name: variable.language.fish
         match: "(\\$)(PATH|CDPATH|FISH_DEBUG|FISH_DEBUG_OUTPUT|LANG|LC_(ALL|COLLATE|CTYPE|MESSAGES|MONETARY|NUMERIC)|fish_color_(normal|command|keyword|quote|redirection|end|error|param|valid_path|option|comment|selection|operator|escape|autosuggestion|cwd|cwd_root|user|host|host_remote|status|cancel|search_match)|fish_ambiguous_width|fish_emoji_width|fish_autosuggestion_enabled|fish_handle_reflow|fish_key_bindings|fish_escape_delay_ms|fish_greeting|fish_history|fish_trace|fish_user_paths|umask|BROWSER|_|argv|CMD_DURATION|COLUMNS|LINES|fish_kill_signal|fish_killring|fish_pid|history|HOME|hostname|IFS|last_pid|PWD|pipestatus|SHLVL|status|status_generation|USER|EUID|version|FISH_VERSION|__fish_bin_dir|__fish_config_dir|__fish_data_dir|__fish_help_dir|__fish_sysconf_dir|__fish_user_data_dir)\\b"
         captures:
-          "1": { name: punctuation.definition.variable.fish }
+          1: { name: punctuation.definition.variable.fish }
 
   index-expansion:
     patterns:
@@ -1182,10 +1183,10 @@ repository:
         # Note that command substitution should only have a single index expansion
         begin: \[
         beginCaptures:
-          "0": { name: punctuation.section.brackets.begin.fish }
+          0: { name: punctuation.section.brackets.begin.fish }
         end: \]
         endCaptures:
-          "0": { name: punctuation.section.brackets.end.fish }
+          0: { name: punctuation.section.brackets.end.fish }
         # The number of index expansion parameter lists `[...]` should always be
         # less than or equal to the number of variable expansion operators `$`.
         # Unfortunately, we can do nothing to moderate that with this syntax
@@ -1229,10 +1230,10 @@ repository:
       - name: string.quoted.single.fish
         begin: \'
         beginCaptures:
-          "0": { name: punctuation.definition.string.begin.fish }
+          0: { name: punctuation.definition.string.begin.fish }
         end: \'
         endCaptures:
-          "0": { name: punctuation.definition.string.end.fish }
+          0: { name: punctuation.definition.string.end.fish }
         patterns:
           # Only accepted escapes are \' and \\
           - name: constant.character.escape.fish
@@ -1241,10 +1242,10 @@ repository:
       - name: string.quoted.double.fish
         begin: \"
         beginCaptures:
-          "0": { name: punctuation.definition.string.begin.fish }
+          0: { name: punctuation.definition.string.begin.fish }
         end: \"
         endCaptures:
-          "0": { name: punctuation.definition.string.end.fish }
+          0: { name: punctuation.definition.string.end.fish }
         patterns:
           - include: "#string-quoted-contents"
 
@@ -1260,10 +1261,10 @@ repository:
       # - name: string.interpolated.dollar.fish
       #   begin: \$\(
       #   beginCaptures:
-      #     "0": { name: punctuation.definition.string.begin.shell }
+      #     0: { name: punctuation.definition.string.begin.shell }
       #   end: \)
       #   endCaptures:
-      #     "0": { name: punctuation.definition.string.end.shell }
+      #     0: { name: punctuation.definition.string.end.shell }
       #   patterns:
       #     - include: "#command-substitution"
       #     - include: $self
@@ -1290,11 +1291,11 @@ repository:
       - name: meta.braces.brace-expansion.fish
         begin: \{
         beginCaptures:
-          "0": { name: punctuation.section.braces.begin.fish }
+          0: { name: punctuation.section.braces.begin.fish }
         end: (\})|(\n|[;&)|].*)
         endCaptures:
-          "1": { name: punctuation.section.braces.end.fish }
-          "2": { name: invalid.illegal.punctuation.section.fish }
+          1: { name: punctuation.section.braces.end.fish }
+          2: { name: invalid.illegal.punctuation.section.fish }
         patterns:
           - name: punctuation.section.braces.separator.fish
             match: \,
@@ -1329,9 +1330,9 @@ repository:
       - name: meta.wildcard-expansion.fish
         match: (\*\*)|(\*)|(\?)
         captures:
-          "1": { name: keyword.operator.double-star.fish }
-          "2": { name: keyword.operator.single-star.fish }
-          "3": { name: keyword.operator.question-mark.fish }
+          1: { name: keyword.operator.double-star.fish }
+          2: { name: keyword.operator.single-star.fish }
+          3: { name: keyword.operator.question-mark.fish }
 
   string-unquoted-contents-escapes:
     patterns:

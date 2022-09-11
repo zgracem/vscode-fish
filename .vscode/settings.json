@@ -5,7 +5,12 @@
       "url": "./.vscode/schemas/tmLanguage.schema.json"
     }
   ],
-  "workbench.colorTheme": "Community Material Theme Palenight",
+  "typescript.tsc.autoDetect": "off",
+  "workbench.colorTheme": "One Dark Pro",
+  "yaml.format.bracketSpacing": true,
+  "yaml.format.printWidth": 255,
+  "yaml.format.proseWrap": "preserve",
+  "yaml.format.singleQuote": false,
   "yaml.schemaStore.enable": false,
   "yaml.schemas": {
     "./.vscode/schemas/tmLanguage.schema.json": ["/syntaxes/*.tmLanguage.yaml"]
@@ -18,10 +23,5 @@
   "[yaml]": {
     "editor.formatOnPaste": false,
     "editor.formatOnSave": false
-  },
-  "yaml.format.bracketSpacing": true,
-  "yaml.format.printWidth": 255,
-  "yaml.format.proseWrap": "preserve",
-  "yaml.format.singleQuote": false,
-  "typescript.tsc.autoDetect": "off"
+  }
 }
