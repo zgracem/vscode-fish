@@ -1,13 +1,15 @@
 {
   "json.schemas": [
     {
-      "fileMatch": [
-        "*.tmLanguage.json"
-      ],
-      "url": "./.vscode/schemas/tmLanguage.json"
+      "fileMatch": ["*.tmLanguage.json"],
+      "url": "./.vscode/schemas/tmLanguage.schema.json"
     }
   ],
   "workbench.colorTheme": "Community Material Theme Palenight",
+  "yaml.schemaStore.enable": false,
+  "yaml.schemas": {
+    "./.vscode/schemas/tmLanguage.schema.json": ["/syntaxes/*.tmLanguage.yaml"]
+  },
   "[json]": {
     "editor.formatOnPaste": false,
     "editor.formatOnSave": false,

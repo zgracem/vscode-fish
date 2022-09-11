@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "$schema": "https://raw.githubusercontent.com/Septh/tmlanguage/master/tmLanguage.schema.json#",
   "name": "Friendly Interactive Shell (fish)",
   "scopeName": "source.shell.fish",
   "fileTypes": [

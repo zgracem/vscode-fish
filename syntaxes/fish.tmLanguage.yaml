@@ -1,5 +1,5 @@
 ---
-$schema: https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json
+$schema: https://raw.githubusercontent.com/Septh/tmlanguage/master/tmLanguage.schema.json#
 
 # Adapted (incl. comments) from Phidica Veia's syntax def. for Sublime Text:
 # <https://github.com/Phidica/sublime-fish/blob/f838ab4/fish.sublime-syntax>
