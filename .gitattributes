@@ -1,0 +1,4 @@
+# https://github.com/github/linguist/blob/master/docs/overrides.md
+*.json linguist-detectable
+*.yaml linguist-detectable
+*.code-snippets linguist-language=JSON linguist-detectable
